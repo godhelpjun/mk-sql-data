@@ -73,7 +73,6 @@ read text from "data/de-text.txt";
 
 filename is "output/random-data.sql";
 
-# delete all records from the table ADRESSE
 delete clause for ADRESSE is "";
 do delete from ADRESSE;
 
@@ -96,7 +95,7 @@ use Ort as city;
 use ID_ADRESSE as unique;
 set ID_MANDANT to "1";
 set ID_BUCHUNGSKREIS to "1";
-# Germany is 83
+
 set ID_COUNTRY to "83";
 
 set Telefon to randomized phone;
@@ -141,7 +140,7 @@ set _MEDIUM_TEXT_2 to randomized Char between 0 and 4096;
 
 run the export;
 
-# now let us append american adress records
+# now let us append American address records
 
 reset data;
 reset code;
@@ -165,8 +164,6 @@ set ID_BUCHUNGSKREIS to "1";
 # United States of America is 236
 set ID_COUNTRY to "236";
 set Telefon to randomized phone;
-
-# append 1000 records to the export file
 
 run the export;
 
