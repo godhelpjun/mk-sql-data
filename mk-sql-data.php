@@ -4,7 +4,7 @@
 /*
  *
  *	The app mk-test-data is licensed under the terms of the MIT license
- *
+ *	(c) Rainer Stötter 2016-2017
  */
 
 
