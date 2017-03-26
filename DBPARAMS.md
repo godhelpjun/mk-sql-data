@@ -1,5 +1,3 @@
-# DBPARMS
-
 ## Explanation
 
 DBPARMS configures the credentials and establishes a database connection to the server. Only the FETCH parameter needs a connection to the target database.
