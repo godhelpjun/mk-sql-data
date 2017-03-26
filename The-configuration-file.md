@@ -3,6 +3,12 @@ The configuration file consists of commands which are interpreted by mk-sql-data
 
 There are commands, which are executed immediately and commands, which are executed, when the generation of test data is triggered by the command RUN THE EXPORT:
 
+## common rules
+
+[[comments]]
+
+[[commands]]
+
 ## immediate execution:
 
 [[DBPARAMS]]		
