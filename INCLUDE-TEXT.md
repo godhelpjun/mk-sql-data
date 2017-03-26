@@ -1,6 +1,6 @@
 ## Explanation
 
-The INCLUDE command tells mk-sql-data to write the text to be include to the SQL file.
+The INCLUDE command tells mk-sql-data to write the text, which consists of SQL commands, to be included in the SQL file.
 
 ## Syntax:
 
