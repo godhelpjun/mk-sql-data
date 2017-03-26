@@ -1,8 +1,8 @@
-#
-#	script file for mk-sql-data.php
-#
-# comments start with '#'
-# any command ends with ';'
+ #
+ #	script file for mk-sql-data.php
+ #
+ # comments start with '#'
+ # any command ends with ';'
 #
 # the command list is case insensitive - file names and field names are case sensitive:
 #
