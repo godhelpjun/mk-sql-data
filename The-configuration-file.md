@@ -35,3 +35,7 @@ nur von FETCH benötigt
 [[SET .. TO]]
 
 [[USE .. AS]]
+
+## Examples
+
+[[mk-sql-data-00.cmd]]
