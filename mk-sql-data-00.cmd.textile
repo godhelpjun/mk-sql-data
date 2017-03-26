@@ -1,3 +1,63 @@
+```
+#
+#	script file for mk-sql-data.php
+#
+# - comments start with '#'
+# - any command ends with ';'
+#
+# the command list is case insensitive - file names and field names are case sensitive:
+#
+#	filename is "<FILENAME>";
+#
+#	include text = "<TEXT>";
+#
+#	delete for <TABLENAME> is "";
+#	delete for <TABLENAME> is "where x1 = 15;"
+#	delete for <TABLENAME> is "where ID_MANDANT in (select * from MANDANT where Name = 'Mandant 1');";
+#
+#	do delete from <TABLENAME;
+#
+#	work on table <TABLENAME>;
+#
+#	read {PRENAMES|SURNAMES|STREETS|ZIPCODES} from <TEXTFILENAME>;
+#		the files have 1 column zip except the file with the zipcodes, which has 2 columns
+#		you can load more than one file per pattern. the new records will be added to the current ones
+#
+#	start with <RECORDNUMBER>;
+#
+#	export <RECORDCOUNT> records;
+#
+#	use <FIELDNAME> AS {PRENAME|SURNAME|STREET|ZIPCODE|UNIQUE};
+#	set <FIELDNAME> TO <VALUE>;
+#       set <FIELDNAME> TO  RANDOMIZED {DATE|DATETIME|TIME} [IN {PAST|FUTURE}]
+#       set <FIELDNAME> TO  RANDOMIZED {PHONE|BLZ|IBAN|BIC}
+#       set <FIELDNAME> TO  RANDOMIZED {FLOAT|INT|BOOL} [BETWEEN <VALUE>  AND <VALUE>];
+#	set <FIELDNAME> TO  SQL "<SQLVALUE>";
+#	fetch <FIELDNAME> using <SELECTSTATEMENT>;
+#		you can define variables in <SELECTSTATEMENT> with the prefix ':'
+#		<FIELDLIST> := {FIELDNAME} ','
+#		<SELECTSTATEMENT> := <delimiter><SELECT_STATEMENT><delimiter>
+#		<delimiter> := ' | " | `
+#		<FIELDNAME> := <delimiter> <FIELD_NAME> <delimiter>
+#		<TABLENAME> := <delimiter> <TABLE_NAME> <delimiter>
+#
+#	increment <FIELDNAME> depending from <FIELDLIST>;
+#
+#	dbparams = <delimiter> <localhost>,<schema_name>,<user_name>,<user_password>
+#		will not be resetted after declaration!
+#		necessary for fetch-commands
+#
+#	run the export;
+#
+#	# reset the arrays with the imported data
+#	reset data - the names, prenames, zips, cities etc
+#
+#	# reset the earlier defined per row actions ( use, set ) up to the last RUN THE EXPORT
+#	reset actions
+#
+#	# reset code we included - the sql code written before
+#	reset code
+#
 
 include text = "
 
@@ -73,6 +133,7 @@ read text from "data/de-text.txt";
 
 filename is "output/random-data.sql";
 
+# delete all records from the table ADRESSE
 delete clause for ADRESSE is "";
 do delete from ADRESSE;
 
@@ -95,7 +156,7 @@ use Ort as city;
 use ID_ADRESSE as unique;
 set ID_MANDANT to "1";
 set ID_BUCHUNGSKREIS to "1";
-
+# Germany is 83
 set ID_COUNTRY to "83";
 
 set Telefon to randomized phone;
@@ -140,7 +201,7 @@ set _MEDIUM_TEXT_2 to randomized Char between 0 and 4096;
 
 run the export;
 
-# now let us append American address records
+# now let us append american adress records
 
 reset data;
 reset code;
@@ -165,5 +226,10 @@ set ID_BUCHUNGSKREIS to "1";
 set ID_COUNTRY to "236";
 set Telefon to randomized phone;
 
+# append 1000 records to the export file
+
 run the export;
 
+
+
+```
