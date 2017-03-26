@@ -12,7 +12,6 @@ There are commands, which are executed immediately and commands, which are execu
 ## immediate execution:
 
 [[DBPARAMS]]		
-nur von FETCH benötigt
 
 [[DELETE CLAUSE FOR]]
 
