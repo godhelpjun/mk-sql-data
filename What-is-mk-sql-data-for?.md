@@ -9,20 +9,6 @@ mk-sql-data-00.cmd and mk-sql-data-01.cmd for more details.
 The app creates one or more SQL files, which then can be imported into the target database. Normally it does not need a connection to the database server in order to create the test data.
 Only if you are using the FETCH-command or the INCREMENT command, a database connection is necessary. The FETCH command selects relational data out of the database. See mk-sql-data-01.cmd as sample configuration.
 
-At the moment the app supports two target types of test data; it was designed for English and German users. You
-are welcome to support me by providing sample data of your country in order to enlarge the community which can
-use mk-sql-data. Send me please
-
-- a text file with common prenames
-- a text file with common surnames
-- a text file with zips and cities
-- a text file with street names
-- a text file with a longer text
-
-The longer text must not be copyrighted, it could be, for example, the text of an old famous novel in the target language.
-
-I will then add your test data to the app and publish them with the next release of mk-sql-data.
-
 mk-sql-data runs out of the box. You can use the sample script mk-sql-data-00.cmd as starting point in order to
 run a test with the command
 
