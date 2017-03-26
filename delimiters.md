@@ -1,0 +1,1 @@
+Delimiters of strings can be " and ' and `
