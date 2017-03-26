@@ -4,7 +4,9 @@ The DELETE command tells mk-sql-data to write a DELETE statement into the SQL sc
 
 ## Syntax:
 
+```
   delete for <TABLENAME> is <WHERECLAUSE>
+```
 
 ## Example:
 
