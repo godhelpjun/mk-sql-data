@@ -33,9 +33,13 @@ Sets the string column value to a randomized value. It is optionally possible to
 Sets the column value to the result of a SQL expression. 
 
  64 KB = 65535 Bytes
+
  32 KB = 32768 Bytes
+
  16 KB = 16384 Bytes
+
   8 KB = 8192 Bytes
+
   4 KB = 4096 Bytes
 
 ## Syntax:
