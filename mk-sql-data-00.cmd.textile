@@ -41,7 +41,7 @@
 #		<FIELDNAME> := <delimiter> <FIELD_NAME> <delimiter>
 #		<TABLENAME> := <delimiter> <TABLE_NAME> <delimiter>
 #
-#	increment <FIELDNAME> depending from <FIELDLIST>;
+#	increment <FIELDNAME> depending on <FIELDLIST>;
 #
 #	dbparams = <delimiter> <localhost>,<schema_name>,<user_name>,<user_password>
 #		will not be resetted after declaration!
