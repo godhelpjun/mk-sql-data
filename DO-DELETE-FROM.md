@@ -1,6 +1,6 @@
 ## Explanation
 
-DO DELETE CLAUSE FROM writes a SQL DELETE to the SQL File and an optional WHERE part, defined with [[DO DELETE FROM]] .
+DO DELETE CLAUSE FROM writes a SQL DELETE to the SQL File and an optional WHERE part, defined with [[DELETE FOR]] .
 
 ## Syntax:
 
