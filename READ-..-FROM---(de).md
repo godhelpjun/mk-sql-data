@@ -1,6 +1,6 @@
 ## Beschreibung
 
-Der Befehl READ weist mk-sql-data, Daten aus der im Befehl benannten Textdatei auszulesen. Diese Daten können dann vom Befehl [[USE .. AS - (de)]] verwendet werden.
+Der Befehl READ weist mk-sql-data, Daten aus der im Befehl benannten Textdatei auszulesen. Diese Daten können dann vom Befehl [[USE .. AS - (de)]] als Basis für die Randomisierung verwendet werden.
 
 Die meisten der Textdateien bestehen aus einer Textspalte. Die ZIPCODES bestehen jedoch aus zwei Spalten und die TEXT-Datei hat keine Spalten, sondern besteht aus normalem Text.
 
