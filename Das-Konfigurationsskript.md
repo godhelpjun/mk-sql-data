@@ -17,25 +17,27 @@ Manche (de) r Kommandos werden sofort ausgeführt und andere wiederum erst nach 
 
 [[DELETE CLAUSE FOR - (de) ]]
 
-[[EXPORT .. RECORDS - (de) ]]
+[[DO DELETE FROM - (de)]]
 
-[[FILENAME IS - (de) ]]
+[[EXPORT .. RECORDS - (de)]]
 
-[[INCLUDE TEXT - (de) ]]
+[[FILENAME IS - (de)]]
 
-[[READ .. FROM - (de) ]]
+[[INCLUDE TEXT - (de)]]
 
-[[RESET] - (de) ]]
+[[READ .. FROM - (de)]]
 
-[[RUN THE EXPORT - (de) ]]
+[[RESET] - (de)]]
 
-[[START WITH RECORD - (de) ]]
+[[RUN THE EXPORT - (de)]]
 
-[[WORK ON TABLE - (de) ]]
+[[START WITH RECORD - (de)]]
+
+[[WORK ON TABLE - (de)]]
 
 ## Verzögert ausgeführte Befehle
 
-[[FETCH .. USING - (de) ]]
+[[FETCH .. USING - (de)]]
 
 [[INCREMENT .. DEPENDING ON .. IN TABLE - (de) ]]
 
