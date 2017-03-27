@@ -42,6 +42,8 @@ Sets the string column value to a randomized value. It is optionally possible to
 ```
 Sets the column value to the result of a SQL expression. 
 
+See the [[USE .. AS]] command, too.
+
 ## Syntax:
 
 ```
