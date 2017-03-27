@@ -2,7 +2,7 @@
 
 Der Befehl READ weist mk-sql-data, Daten aus der im Befehl benannten Textdatei auszulesen. Diese Daten können dann vom Befehl [[USE .. AS - (de)]] verwendet werden.
 
-Die meisten der Textdateien bestehen aus einer Textspalte. Die ZIPCODES bestehen jedoch aus zwei Spalten und die TEXT-Datei hat keine Spalten, sondern bestteht aus normalem Text.
+Die meisten der Textdateien bestehen aus einer Textspalte. Die ZIPCODES bestehen jedoch aus zwei Spalten und die TEXT-Datei hat keine Spalten, sondern besteht aus normalem Text.
 
 Es ist möglich, mehr als eine Datei zu laden; die neuen Datensätze werden einfach an die schon eingelesenen Daten angehängt. Mit [[RESET - (de)]] können eingelesene Daten wieder aus dem Speicher entfernt werden.
 
