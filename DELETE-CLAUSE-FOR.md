@@ -13,13 +13,13 @@ The DELETE CLAUSE FOR command prepares a [[DO DELETE FROM]] command and gives th
 ## Example:
 
 ```
-   delete for "mytable" is "";
+   delete clause for "mytable" is "";
    do delete from "mytable";
 
-   delete for "tbl" is "where x1 = 15;"
+   delete clause for "tbl" is "where x1 = 15;"
    do delete  from "tbl";
 
-   delete for "clerks" is "where ID_MANDANT in (select * from MANDANT where Name = 'Mandant 1');";
+   delete clause for "clerks" is "where ID_MANDANT in (select * from MANDANT where Name = 'Mandant 1');";
    do delete from "BUCHUNGSKREIS";
 ```
 
