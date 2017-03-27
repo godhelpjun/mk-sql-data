@@ -5,7 +5,7 @@ The DELETE CLAUSE FOR command tells mk-sql-data prepares a DO DELETE command and
 ## Syntax:
 
 ```
-  delete for <TABLENAME> is <WHERECLAUSE>
+  delete clause for <TABLENAME> is <WHERECLAUSE>
 ```
 ## See also
    [[DO DELETE]]
