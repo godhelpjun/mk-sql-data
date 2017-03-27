@@ -4,7 +4,7 @@ The generation of test data is a boring and time-consuming matter. Automatic sol
 
 The processing of mk-sql-data is controlled by a configuration file, which can be easily generated and
 modified. Various column data types can be filled with a fitting randomized input. See the example script files
-mk-sql-data-00.cmd and mk-sql-data-01.cmd for more details.
+[[mk-sql-data-00.cmd]] and mk-sql-data-01.cmd for more details.
 
 The app creates one or more SQL files, which then can be imported into the target database. Normally it does not need a connection to the database server in order to create the test data.
 Only if you are using the FETCH-command or the INCREMENT command, a database connection is necessary. The FETCH command selects relational data out of the database. See mk-sql-data-01.cmd as sample configuration.
