@@ -1,6 +1,6 @@
 ## Explanation
 
-The READ command tells mk-sql-data to read data from textual files. These data can then be used with the [[USE .. AS]] command.
+The READ command tells mk-sql-data to read data from textual files. These data can then be used with the [[USE .. AS]] command as base for the randomization.
 
 Normally the text files have one column text data. The ZIPCODES has two columns and the TEXT file has zero column as it consits of normal text.
 
