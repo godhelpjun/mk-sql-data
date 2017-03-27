@@ -25,11 +25,11 @@ See the [[SET .. TO]] command, too.
 ## Example:
 
 ```
-   use ZIP as zipcode;
-   use NAME as surname;
-   use PRENAME as prename;
-   use STREET as street;
-   use CITY as city;
-   use ID_ADRESSE as unique;
+   use "ZIP" as zipcode;
+   use "NAME" as surname;
+   use "PRENAME" as prename;
+   use "STREET" as street;
+   use "CITY" as city;
+   use "ID_ADRESSE" as unique;
 ```
 
