@@ -1,6 +1,6 @@
 ## Beschreibung
 
-Der Befehl EXPORT legt die ANzahl an Datensätzen fest, die mk-sql-data in die SQL-Datei schreiben soll. 
+Der Befehl EXPORT legt die Anzahl an Datensätzen fest, die mk-sql-data in die SQL-Datei schreiben soll. 
 
 ## Syntax:
 
