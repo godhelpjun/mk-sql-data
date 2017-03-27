@@ -1,4 +1,4 @@
 mk-sql-data runs for me on a Linux-machine with PHP 5, but it should run on other platforms, too. Please do
 inform me, when you made it to run the app with another operating system.
 
-The app generates SQL code for MySQL databases. The code should be usable for other databases, too. Give it a try and inform me, when you succeeded in using the generated code with another SQL dialect, please.
+The app generates SQL code for MySQL databases. The code should be usable for other databases, too as no special features from MySQL are used. Give it a try and inform me, when you succeeded in using the generated code with another SQL dialect, please. You cannot use the commands [[INCREMENT .. DEPENDING ON .. IN TABLE]] and [[FETCH .. USING]] as you would need another interface than mysqli from PHP. Maybe you want to program this interface? It would be very easy.
