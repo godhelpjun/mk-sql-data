@@ -17,7 +17,7 @@ There are commands, which are executed immediately and commands, which are execu
 
 [[DELETE CLAUSE FOR]]
 
-[[EXPORT ... RECORDS]]
+[[EXPORT .. RECORDS]]
 
 [[FILENAME IS]]
 
