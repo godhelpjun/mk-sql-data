@@ -1,7 +1,7 @@
 
 The configuration file consists of commands which are interpreted by mk-sql-data. The commands are in English and should by self-explaining.
 
-There are commands, which are executed immediately and commands, which are executed, when the generation of test data is triggered by the command RUN THE EXPORT:
+There are commands, which are executed immediately and commands, which are executed, when the generation of test data is triggered by the initial command [[RUN THE EXPORT]]:
 
 ## common syntax rules
 
