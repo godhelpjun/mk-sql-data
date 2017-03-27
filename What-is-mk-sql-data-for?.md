@@ -8,12 +8,4 @@ modified. Various column data types can be filled with a flexible definable and 
 According to the rules in the configuration script the program creates one or more SQL files, which then can be imported into the target database. Normally it does not need a connection to the database server in order to create the test data.
 Only if you are using the commands [[FETCH .. USING]] or [[INCREMENT .. DEPENDING ON .. IN TABLE]], a database connection is necessary. The FETCH command selects relational data out of the database. See [[mk-sql-data-01.cmd]] as sample configuration.
 
-mk-sql-data runs out of the box. You can use the sample script [[mk-sql-data-00.cmd]] as starting point in order to run a test with the command
-
-    mk-sql-data.php --cfg mk-sql-data-00.cmd
-
-Import the generated SQL file into the database with 
-
-    mysql -u user -ppassword database < output/random-data.sql
-
 The program mk-sql-data is published under the terms of the MIT license.
