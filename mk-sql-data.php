@@ -1,6 +1,8 @@
 #!/usr/bin/php
 <?php
 
+error_reporting( E_STRICT );
+
 /*
  *
  *	The app mk-test-data is licensed under the terms of the MIT license
@@ -272,7 +274,10 @@ class cConfigFile {
 
 	}
 
-	if ( $chr == ';' ) $this->GetCh( );
+	if ( $chr == ';' ) {
+	    $this->GetCh( );
+	    $cmd .= ';';
+	}
 
 	return trim( $cmd );
 
@@ -720,8 +725,6 @@ class cCommand {
 
 	$this->SkipSpaces( );
 
-	//
-
 	return $ret;
 
     }	// function GetTextBetweenDelimiters( )
@@ -977,9 +980,9 @@ class cCommand {
       // bei den ZIP-Daten haben wir etwa zwei Spalten
       // Ein reiner Text hat 0 Spalten
 
-      if ( ! $anzahl_spalten ) {
+      if ( ! $anzahl_spalten ) {  // der lange Text
 
-	  $ary = file_get_contents( $file_name );
+	  $ary = str_replace( '"', "`", file_get_contents( $file_name ) );
 
 	  return;
 
@@ -1001,7 +1004,7 @@ class cCommand {
 	  if ( $anzahl_spalten == 1 ) {
 
 	      $element = trim( $line );
-	      if ( strlen( $element ) ) $ary[]= $element ;
+	      if ( strlen( $element ) ) $ary[] = $element ;
 
 	  } elseif ( $anzahl_spalten == 2 ) {
 
@@ -1043,19 +1046,19 @@ class cCommand {
 	    $token = strtoupper( $token );
 
     	    if (  $token == 'PRENAMES' ) {
-		$ary = &$this->m_a_prenames;
+		$ary = & $this->m_a_prenames;
 		$anzahl_spalten = 1;
     	    } elseif (  $token == 'SURNAMES' ) {
-		$ary = &$this->m_a_surnames;
+		$ary = & $this->m_a_surnames;
 		$anzahl_spalten = 1;
     	    } elseif (  $token == 'STREETS' ) {
-		$ary = &$this->m_a_streets;
+		$ary = & $this->m_a_streets;
 		$anzahl_spalten = 1;
     	    } elseif (  $token == 'ZIPCODES' ) {
-		$ary = &$this->m_a_zipcodes;
+		$ary = & $this->m_a_zipcodes;
 		$anzahl_spalten = 2;
 	    } elseif (  $token == 'TEXT' ) {
-		$ary = &$this->m_long_text;
+		$ary = & $this->m_long_text;
 		$anzahl_spalten = 0;
     	    } else {
 		die( "\n program crashed: READ FROM with unknown token '{$token}'" );
@@ -1100,6 +1103,23 @@ class cCommand {
 
     }	// function UnGetCh( )
 
+    private function AssertFollowingSemicolon( ) {
+
+	//
+	// abort the program, when there is no following semicolon
+	//
+
+	$this->SkipSpaces( );
+
+	if ( $this->m_chr != ';' ) {
+
+	    die( "\n aborting: error: semicolon expected, but '{$this->m_chr}' detected in command '{$this->m_command}'" );
+
+	}
+
+
+    }	// function AssertFollowingSemicolon( )
+
     protected function ScanUntilFolgezeichen( $zeichen ) {
 
       // liest samt dem Folgezechen alles ein und positioniert auf das erste Zeichen danach
@@ -1124,6 +1144,12 @@ class cCommand {
 // 	    if ( $this->m_chr != $zeichen ) echo "\n Warning: ScanUntilFolgezeichen( ) endet auf '$this->m_chr'";
 // 	    $this->GetCh( );
 	    assert( $this->m_chr != $zeichen );
+
+	}
+
+	if ( $this->m_chr == '' ) {
+
+	    die( "\n aborting: error: expected '$zeichen' but reached the string end in \n $this->m_command" );
 
 	}
 
@@ -1156,12 +1182,27 @@ class cCommand {
     }	// function is_ctype_identifier( )
 
 
+    protected function is_ctype_number( $chr ) {
+
+	return ( $chr == '.' ) || ( ctype_digit( $chr )  ) ;
+
+    }	// function is_ctype_number( )
+
+
     protected function is_ctype_identifier_start( $chr ) {
 
-	return ( $chr == '_' ) || ( ctype_alpha( $chr ) ) ;
+	return  ( ctype_alnum( $chr ) ) ;
 
     }	// function is_ctype_identifier_start( )
 
+    protected function is_ctype_number_start( $chr ) {
+
+	return  ( ctype_digit( $chr ) ) ;
+
+    }	// function is_ctype_number_start( )
+
+
+/*
     protected function ScanNumber( ) {
 
 	    $token = '';
@@ -1184,6 +1225,7 @@ class cCommand {
 	    return $token;
 
     }	// function ScanNumber( );
+*/
 
     protected function ScanToken( ) {
 
@@ -1207,6 +1249,31 @@ class cCommand {
 	    return $token;
 
     }	// function ScanToken( );
+
+
+    protected function ScanNumber( ) {
+
+	    $token = '';
+
+	    if ( $this->is_ctype_number_start( $this->m_chr ) )  {
+
+		$token .= $this->m_chr;
+
+		while ( ( $this->is_ctype_number( $chr = $this->GetCh( ) ) ) &&
+			( $chr != '' ) &&
+			( $chr != ',' ) &&
+			( $chr != ';' ) )
+			{
+
+		    $token .= $chr;
+		}
+
+	    }
+
+	    return $token;
+
+    }	// function ScanNumber( );
+
 
       private function NextToken( ) {
 
@@ -1511,11 +1578,11 @@ class cCommand {
 
 	    if ( $data_type == 'FLOAT' ) {
 
-		return $this->RandomFloat( $param1, $param2 );
+		return $this->RandomFloat( $param2, $param3 );
 
 	    } elseif ( $data_type == 'INT' ) {
 
-		return $this->RandomInt( $param1, $param2 );
+		return $this->RandomInt( $param2, $param3 );
 
 	    } elseif ( $data_type == 'BOOLEAN' ) {
 
@@ -1523,7 +1590,7 @@ class cCommand {
 
 	    }  elseif ( $data_type == 'CHAR' ) {
 
-		return $this->RandomText( $param1, $param2 );
+		return $this->RandomText( $param2, $param3 );
 
 	    }
 
@@ -1562,8 +1629,8 @@ class cCommand {
 		 elseif ( $data_type == 'BLZ' ) { $value = $this->RandomBLZ( ); }
 
 	    } elseif ( $this->StringFoundIn( $data_type, 'FLOAT', 'INT', 'BOOLEAN', 'CHAR' ) ) {
+		  // echo "\n Randomize( ) : float gefunden type = $data_type und p1 = $param1 und p2 = $param2 und p3 = $param3";
 
-// 	    echo "\n data_type = $data_type param1 = $param1 param2 = $param2 param3 = $param3";
 
 		$value = $this->RandomizeNormalType(  $data_type, $param1, $param2, $param3 );
 
@@ -1634,7 +1701,12 @@ class cCommand {
 
 	    $table_name = $token;
 
-	    $where = $this->m_a_delete_clauses[ $table_name ];
+	    if ( isset( $this->m_a_delete_clauses[ $table_name ] ) ) {
+		$where = $this->m_a_delete_clauses[ $table_name ];
+	    } else {
+		$where = '';
+	    }
+
 	    if ( $where == '' ) {
 		$this->m_sql_code .= "\n DELETE FROM $table_name;";
 	    } else {
@@ -1642,6 +1714,9 @@ class cCommand {
 	    }
 
 	    echo "\n". $this->m_obj_colors->ColoredCLI( 'DELETING records with where = ' . $where,  'dark_gray' ) ;
+
+	    // assert there follows a semicolon
+	    $this->AssertFollowingSemicolon( );
 
 	} elseif ( $token_next == 'INCREMENT' ) {
 
@@ -1736,6 +1811,10 @@ class cCommand {
 	    // Die Abbilldungsvorschrift definieren
 	    $this->m_a_changes[]= array( self::__IMPORT_INCREMENTED__, $obj_command_increment );
 
+	    // assert there follows a semicolon
+	    $this->AssertFollowingSemicolon( );
+
+
 
 	} elseif ( $token_next == 'FETCH' ) {
 
@@ -1827,6 +1906,9 @@ class cCommand {
 	    // Die Abbilldungsvorschrift definieren
 	    $this->m_a_changes[]= array( self::__IMPORT_BY_FETCH__, $obj_command_fetch );
 
+	    // assert there follows a semicolon
+	    $this->AssertFollowingSemicolon( );
+
 
 	} elseif ( $token_next == 'DBPARAMS' ) {
 
@@ -1875,6 +1957,10 @@ class cCommand {
 
 	    $obj_command_database_params = new cCommandDatabaseParams( $params );
 	    $this->m_mysqli = $obj_command_database_params->GetOpenedDatabase( );
+
+	    // assert there follows a semicolon
+	    $this->AssertFollowingSemicolon( );
+
 
 	} elseif ( $token_next == 'DELETE' ) {
 
@@ -1934,6 +2020,10 @@ class cCommand {
 
 	    echo "\n". $this->m_obj_colors->ColoredCLI( "delete clause for table '$table_name' detected ", 'dark_gray' ) ;
 
+	    // assert there follows a semicolon
+	    $this->AssertFollowingSemicolon( );
+
+
 	} elseif ( $token_next == 'WORK' ) {
 
 	    $this->SkipSpaces( );
@@ -1967,6 +2057,10 @@ class cCommand {
 
 	    $this->m_act_table = $token;
 	    echo "\n". $this->m_obj_colors->ColoredCLI( 'Working on ' . $token,  'dark_gray' ) ;
+
+	    // assert there follows a semicolon
+	    $this->AssertFollowingSemicolon( );
+
 
 	} elseif ( $token_next == 'START' ) {
 
@@ -2007,6 +2101,10 @@ class cCommand {
 	    }
 */
 
+	    // assert there follows a semicolon
+	    $this->AssertFollowingSemicolon( );
+
+
 	} elseif ( $token_next == 'EXPORT' ) {
 
 	    $this->SkipSpaces( );
@@ -2029,6 +2127,10 @@ class cCommand {
 	    }
 
 	    echo "\n". $this->m_obj_colors->ColoredCLI( 'Exporting ' . $this->m_records_to_export . ' records ',  'dark_gray' ) ;
+
+	    // assert there follows a semicolon
+	    $this->AssertFollowingSemicolon( );
+
 
 	} elseif ( $token_next == 'INCLUDE' ) {
 
@@ -2067,6 +2169,9 @@ class cCommand {
 	    $this->m_sql_code .= $token;
 
 	    echo "\n". $this->m_obj_colors->ColoredCLI( 'included string constant', 'dark_gray' ) ;
+
+	    // assert there follows a semicolon
+	    $this->AssertFollowingSemicolon( );
 
 	} elseif ( $token_next == 'READ' ) {
 
@@ -2116,6 +2221,10 @@ class cCommand {
 	    echo "\n". $this->m_obj_colors->ColoredCLI( 'Importing records from ' . $token,  'dark_gray' ) ;
 	    $this->ImportTextData( $this->m_read_mode, $this->m_act_filename_import );
 
+	    // assert there follows a semicolon
+	    $this->AssertFollowingSemicolon( );
+
+
 	} elseif ( $token_next == 'USE' ) {
 
 	    $this->SkipSpaces( );
@@ -2155,6 +2264,10 @@ class cCommand {
 
 	    // Die Abbilldungsvorschrift definieren
 	    $this->m_a_changes[]= array( self::__IMPORT_CHANGE_USE__, $field_name, $array_name );
+
+	    // assert there follows a semicolon
+	    $this->AssertFollowingSemicolon( );
+
 
 	}  elseif ( $token_next == 'SET' ) {
 
@@ -2229,7 +2342,6 @@ class cCommand {
 		    die ( "\n Program crashed: set column name : RANDOMIZED or SQL expected, but received '$token'" );
 		}
 
-
 		if ( $token == 'RANDOMIZED' ) {
 
 		    $this->SkipSpaces( );
@@ -2241,8 +2353,7 @@ class cCommand {
 
 		    $data_type = $token;
 
-
-		    if ( strtoupper( $this->NextToken( ) == 'IN' ) ) {
+		    if ( strtoupper( $this->NextToken( ) ) == 'IN' ) {
 
 			$this->SkipSpaces( );
 			$token = strtoupper( $this->ScanToken( ) );
@@ -2259,15 +2370,16 @@ class cCommand {
 
 			$param2 = $token;
 
-		    } elseif ( strtoupper( $this->NextToken( ) == 'BETWEEN' ) ) {
+		    } elseif ( strtoupper( $this->NextToken( ) ) == 'BETWEEN' ) {
 
+			// skip 'BETWEEN'
 			$this->SkipSpaces( );
 			$token = strtoupper( $this->ScanToken( ) );
 
 			$param1 = $token;
 
 			$this->SkipSpaces( );
-			$token = strtoupper( $this->ScanToken( ) );
+			$token = strtoupper( $this->ScanNumber( ) );
 
 			$param2 = $token;
 
@@ -2279,7 +2391,8 @@ class cCommand {
 			}
 
 			$this->SkipSpaces( );
-			$token = strtoupper( $this->ScanToken( ) );
+			$token = strtoupper( $this->ScanNumber( ) );
+
 
 			$param3 = $token;
 
@@ -2289,6 +2402,23 @@ class cCommand {
 		    $this->m_a_changes[]= array( self::__IMPORT_CHANGE_SET_RANDOMIZED__, $field_name, $data_type, $param1, $param2, $param3 );
 
 		    echo "\n". $this->m_obj_colors->ColoredCLI( "Randomizing column '$field_name' ",  'dark_gray' ) ;
+
+/*
+
+Abbildungsvorschrift von __IMPORT_CHANGE_SET_RANDOMIZED__ mit einem FLOAT mit BETWEEN
+
+Array
+
+0      __IMPORT_CHANGE_SET_RANDOMIZED__				Randomize	RandomizeNormalType
+1	fieldname
+2	datatype				'FLOAT'		'FLOAT'		'FLOAT'
+3	param1					'BETWEEN'	'BETWEEN'	'BETWEEN'
+4	param2					float_1		float_1		float_1
+5	param3					float_2		float_2		float_2
+
+
+*/
+
 
 		} elseif ( $token == 'SQL' ) {
 
@@ -2321,6 +2451,10 @@ class cCommand {
 		}
 	    }
 
+	    // assert there follows a semicolon
+	    $this->AssertFollowingSemicolon( );
+
+
 	}  elseif ( $token_next == 'RUN' ) {
 
 	    $this->SkipSpaces( );
@@ -2342,6 +2476,10 @@ class cCommand {
 
 	    echo "\n". $this->m_obj_colors->ColoredCLI( "running the export to file '$this->m_act_filename_export'",  'dark_gray' ) ;
 	    $this->DoTheExport( );
+
+	    // assert there follows a semicolon
+	    $this->AssertFollowingSemicolon( );
+
 
 	} elseif ( $token_next == 'FILENAME' ) {
 
@@ -2385,6 +2523,9 @@ class cCommand {
 
 	    echo "\n". $this->m_obj_colors->ColoredCLI( "exporting now to file '$token' ",  'dark_gray' ) ;
 
+	    // assert there follows a semicolon
+	    $this->AssertFollowingSemicolon( );
+
 	} elseif ( $token_next == 'RESET' ) {
 
 	    $this->SkipSpaces( );
@@ -2408,11 +2549,12 @@ class cCommand {
 		echo "\n". $this->m_obj_colors->ColoredCLI( "resetting included code",  'red' ) ;
 	    }
 
-
+	    // assert there follows a semicolon
+	    $this->AssertFollowingSemicolon( );
 
 	} else {
 
-	    die( "\n Program crashed: Unknown command in '$this->m_command'" );
+	    die( "\n Program crashed: Unknown command '{$token_next}' in '$this->m_command'" );
 
 	}
 

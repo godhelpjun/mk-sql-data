@@ -143,7 +143,7 @@ set REVFIRST to randomized DATETIME IN PAST;
 
 fetch 'country_id' using `select country_id from countries`;
 
-run the export
+run the export;
 
 # then we add records to fk_address
 
