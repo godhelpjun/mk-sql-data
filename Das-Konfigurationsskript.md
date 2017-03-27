@@ -27,7 +27,7 @@ Manche (de) r Kommandos werden sofort ausgeführt und andere wiederum erst nach 
 
 [[READ .. FROM - (de)]]
 
-[[RESET]] - (de)]]
+[[RESET - (de)]]
 
 [[RUN THE EXPORT - (de)]]
 
