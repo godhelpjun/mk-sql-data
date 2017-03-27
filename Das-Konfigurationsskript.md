@@ -1,7 +1,7 @@
 
 Die Konfigurationdatei beinhaltet die einzelnen Befehle, von mk-sql-data interpretiert und abgearbeitet werden. Die Befehle sind in einem leicht verständlichen Pseudoenglisch gehalten und damit selbsterklärend.
 
-Manche der Kommandos werden sofort ausgeführt und andere wiederum erst nach einem initialen [[RUN THE EXPORT - de]]:
+Manche (de) r Kommandos werden sofort ausgeführt und andere wiederum erst nach einem initialen [[RUN THE EXPORT - (de) ]]:
 
 ## Allgemeine syntaktische Regeln
 
@@ -13,35 +13,35 @@ Manche der Kommandos werden sofort ausgeführt und andere wiederum erst nach ein
 
 ## Sofort ausgeführte Befehle:
 
-[[DBPARAMS - de]]		
+[[DBPARAMS - (de) ]]		
 
-[[DELETE CLAUSE FOR - de]]
+[[DELETE CLAUSE FOR - (de) ]]
 
-[[EXPORT .. RECORDS - de]]
+[[EXPORT .. RECORDS - (de) ]]
 
-[[FILENAME IS - de]]
+[[FILENAME IS - (de) ]]
 
-[[INCLUDE TEXT - de]]
+[[INCLUDE TEXT - (de) ]]
 
-[[READ .. FROM - de]]
+[[READ .. FROM - (de) ]]
 
-[[RESET] - de]
+[[RESET] - (de) ]
 
-[[RUN THE EXPORT - de]]
+[[RUN THE EXPORT - (de) ]]
 
-[[START WITH RECORD - de]]
+[[START WITH RECORD - (de) ]]
 
-[[WORK ON TABLE - de]]
+[[WORK ON TABLE - (de) ]]
 
 ## Verzögert ausgeführte Befehle
 
-[[FETCH .. USING - de]]
+[[FETCH .. USING - (de) ]]
 
-[[INCREMENT .. DEPENDING ON .. IN TABLE - de]]
+[[INCREMENT .. DEPENDING ON .. IN TABLE - (de) ]]
 
-[[SET .. TO - de]]
+[[SET .. TO - (de) ]]
 
-[[USE .. AS - de]]
+[[USE .. AS - (de) ]]
 
 ## Beispielskripte
 
