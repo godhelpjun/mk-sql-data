@@ -5,7 +5,7 @@ The DO DELETE command tells mk-sql-data to write a DELETE statement into the SQL
 ## Syntax:
 
 ```
-  delete from <TABLENAME> 
+  do delete from <TABLENAME> 
 ```
 ## See also
    [[DELETE CLAUSE FOR]]
@@ -13,13 +13,13 @@ The DO DELETE command tells mk-sql-data to write a DELETE statement into the SQL
 ## Example:
 
 ```
-   delete for "mytable" is "";
-   delete from "mytable";
+   do delete clause for "mytable" is "";
+   do delete from "mytable";
 
-   delete for "tbl" is "where x1 = 15;"
-   delete  from "tbl";
+   do delete clause for "tbl" is "where x1 = 15;"
+   do delete  from "tbl";
 
-   delete for "clerks" is "where ID_MANDANT in (select * from MANDANT where Name = 'Mandant 1');";
-   delete from §BUCHUNGSKREIS";
+   do delete clause for "clerks" is "where ID_MANDANT in (select * from MANDANT where Name = 'Mandant 1');";
+   do delete from §BUCHUNGSKREIS";
 ```
 
