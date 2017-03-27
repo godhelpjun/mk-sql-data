@@ -1,1 +1,1 @@
-This page is part of the documentation of the tool mk-sql-data
+This wiki page is part of the documentation of the tool mk-sql-data
