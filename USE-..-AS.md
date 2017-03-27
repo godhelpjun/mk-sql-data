@@ -20,7 +20,7 @@ Treat the column as unique number
    use <FIELDNAME> AS {PRENAME|SURNAME|STREET|ZIPCODE|UNIQUE};
 ```
 
-See the [[SET .. TO]]command, too.
+See the [[SET .. TO]] command, too.
 
 ## Example:
 
