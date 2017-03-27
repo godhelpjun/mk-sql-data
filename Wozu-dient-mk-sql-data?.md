@@ -6,12 +6,4 @@ Der Programmablauf von mk-sql-data wird über eine Konfigurationsdatei gesteuert
 
 Das Programm erzeugt gemäß den Vorschriften im Steuerskript eine oder mehrere SQL-Dateien, welche dann in die Zieldatenbank importiert werden können. Normalerweise ist bei der Codegenerierung keine Datenbankverbindung nötig. Ausnahmen von der Regel sind die Kommandos [[FETCH .. USING]] und [[INCREMENT .. DEPENDING ON .. IN TABLE]], welche mit dem Datenbankserver in Verbindung treten müssen. Das FETCH-Kommando liest nämlich relationale Daten aus der Datenbank aus. Werfen Sie dazu bitte einen Blick auf das Beispielskript [[mk-sql-data-01.cmd]].
 
-mk-sql-data läuft ohne weiteren Einstellungen gleich nach Installation des Programms in einem Verzeichnis. Sie können das Beispielskript [[mk-sql-data-00.cmd]] als Schnelleinstieg verwenden, um das Programm zu testen. Geben Sie dazu das folgende Kommando ein:
-
-    mk-sql-data.php --cfg mk-sql-data-00.cmd
-
-Um die von mk-sql-data erzeugte SQL-Datei in die Datenbank zu importieren geben Sie dann das folgende Kommando ein:
-
-    mysql -u Benutzername -pPasswort Datenbank < output/random-data.sql
-
 Das Programm mk-sql-data wurde unter den Bestimmungen der MIT-Lizenz veröffentlicht.
