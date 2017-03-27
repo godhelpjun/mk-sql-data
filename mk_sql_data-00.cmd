@@ -159,7 +159,7 @@ set "ID_BUCHUNGSKREIS" to "1";
 # Germany is 83
 set "ID_COUNTRY" to "83";
 
-set "Telefon to randomized phone;
+set "Telefon" to randomized phone;
 set "_Datetime_1" to randomized DATETIME ;
 set "_Datetime_2" to randomized DATETIME IN PAST;
 set "_Datetime_3" to randomized DATETIME IN PAST;
@@ -209,7 +209,7 @@ reset actions;
 
 read prenames from "data/us-prenames.txt";
 read surnames from "data/us-surnames.txt";
-read streets from "data-us-streets.txt";
+read streets from "data/us-streets.txt";
 # zip codes have two columns!
 read zipcodes from "data/us-zips.txt";
 read text from "data/us-text.txt";

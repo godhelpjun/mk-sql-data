@@ -989,7 +989,7 @@ class cCommand {
 
      if ( $filehandle === false ) {
 
-	  die( "\n Error opening {$filename}" );
+	  die( "\n Error opening {$file_name}" );
 
       }
 
@@ -1627,7 +1627,7 @@ class cCommand {
 	    $this->SkipSpaces( );
 
 	    if ( $this->FollowsDelimiter( ) ) {
-		$this->GetTextBetweenDelimiters( $field_name );
+		$this->GetTextBetweenDelimiters( $token );
 	    } else {
 		$token = $this->ScanToken( ) ;
 	    }
