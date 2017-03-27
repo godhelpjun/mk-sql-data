@@ -6,8 +6,4 @@ mk-sql-data läuft ohne weiteren Einstellungen gleich nach Installation des Prog
 Um die von mk-sql-data erzeugte SQL-Datei in die Datenbank zu importieren geben Sie dann das folgende Kommando ein:
 ```
     mysql -u Benutzername -pPasswort Datenbank < output/random-data.sql
-    mk-sql-data.php --cfg mk-sql-data-00.cmd
 ```
-Um die von mk-sql-data erzeugte SQL-Datei in die Datenbank zu importieren geben Sie dann das folgende Kommando ein:
-
-    mysql -u Benutzername -pPasswort Datenbank < output/random-data.sql
