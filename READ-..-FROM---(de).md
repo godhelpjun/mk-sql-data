@@ -15,10 +15,10 @@ Es ist möglich, mehr als eine Datei zu laden; die neuen Datensätze werden einf
 ## Beispiel:
 
 ```
-   read prenames from "data/de-prenames.txt";
-   read surnames from "data/de-surnames.txt";
-   read streets from "data/de-streets.txt";   
-   read zipcodes from "data/de-zips.txt";
-   read text from "data/de-text.txt";   
+   read prenames from "data/de-prenames.txt";  # Vornamen
+   read surnames from "data/de-surnames.txt";  # Nachnamen
+   read streets from "data/de-streets.txt";    # Straßemverzeichnis
+   read zipcodes from "data/de-zips.txt";      # Postleitzahlen und Städte
+   read text from "data/de-text.txt";          # Textdaten
 ```
 
