@@ -1,4 +1,4 @@
-# Documentation of the mk-sql-data app
+# Dokumentation des Programmes mk-sql-data
 
 [[Wozu dient mk-sql-data?]]
 
