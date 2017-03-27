@@ -4,6 +4,8 @@
 
 [[Requirements]]
 
+[[Quick start]]
+
 [[The application and it's parameters]]
 
 [[The configuration file]]
