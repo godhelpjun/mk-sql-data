@@ -33,7 +33,7 @@ There are commands, which are executed immediately and commands, which are execu
 
 [[WORK ON TABLE]]
 
-## executed during the export 
+## deferred execution during the export 
 
 [[FETCH .. USING]]
 
