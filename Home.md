@@ -2,7 +2,7 @@ Welcome to the mk-sql-data wiki!
 
 Documentation:
 
-[[English Documentation]]
+[[English documentation]]
 
 [[Deutsche Dokumentation]]
 
