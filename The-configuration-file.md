@@ -46,3 +46,5 @@ There are commands, which are executed immediately and commands, which are execu
 ## Examples
 
 [[mk-sql-data-00.cmd]]
+
+[[mk-sql-data-01.cmd]] needs connection to an existing database server
