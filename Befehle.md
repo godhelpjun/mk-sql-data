@@ -6,5 +6,4 @@ Befehle können aus mehreren Worten bestehen; Befehle enden stets mit einem Stri
 
 ```
 run the export;
-
 ```
