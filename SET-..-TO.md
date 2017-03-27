@@ -27,11 +27,6 @@ Sets the numeric column value to a randomized value. We differ between float, in
 ```
 Sets the string column value to a randomized value. It is optionally possible to define the length of the string with BETWEEN.
 
-```
-   set <FIELDNAME> TO  SQL "<SQLVALUE>";   
-```
-Sets the column value to the result of a SQL expression. 
-
  64 KB = 65535 Bytes
 
  32 KB = 32768 Bytes
@@ -41,6 +36,11 @@ Sets the column value to the result of a SQL expression.
   8 KB = 8192 Bytes
 
   4 KB = 4096 Bytes
+
+```
+   set <FIELDNAME> TO  SQL "<SQLVALUE>";   
+```
+Sets the column value to the result of a SQL expression. 
 
 ## Syntax:
 
