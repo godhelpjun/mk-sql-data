@@ -10,13 +10,13 @@ You can declare more than one column name in the FIELDLIST.
 
 ## Syntax:
 ```
-    fetch <FIELDLIST> using <SELECTSTATEMENT>;
+   fetch <FIELDLIST> using <SELECTSTATEMENT>;
 ```
 
 ## Example:
 
 ```
-fetch 'ID_COUNTRY' using 'select country_id from COUNTRIES';
-fetch 'ID_MANDANT,ID_BUCHUNGSKREIS' using "select ID_MANDANT,ID_BUCHUNGSKREIS from BUCHUNGSKREIS where xx = 1";
+   fetch 'ID_COUNTRY' using 'select country_id from COUNTRIES';
+   fetch 'ID_MANDANT,ID_BUCHUNGSKREIS' using "select ID_MANDANT,ID_BUCHUNGSKREIS from BUCHUNGSKREIS where xx = 1";
 ```
 
