@@ -6,7 +6,7 @@ Let there be, for example, a table with the name ADDRESS with address data. In A
 
 You have to define [[DBPARAMS]] before you can use this feature. mk-sql-data will then try to fetch the possible relating data from the table in the database with the SELECTSTATEMENT you have provided.
 
-You can declare more than one column names in the FIELDLIST.
+You can declare more than one column name in the FIELDLIST.
 
 ## Syntax:
 ```
