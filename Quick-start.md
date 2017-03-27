@@ -6,4 +6,4 @@ Run the command
 
 Import the generated SQL file into the database with
 
-    mysql -u user -ppassword database < data.sql
+    mysql -u user -ppassword database < output/random-data.sql
