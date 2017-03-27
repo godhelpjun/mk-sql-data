@@ -9,7 +9,7 @@ There are commands, which are executed immediately and commands, which are execu
 
 [[commands]]
 
-[[delimiters]]
+[[string delimiters]]
 
 ## immediate execution:
 
