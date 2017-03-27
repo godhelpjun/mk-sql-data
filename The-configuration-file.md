@@ -37,7 +37,7 @@ There are commands, which are executed immediately and commands, which are execu
 
 [[FETCH .. USING]]
 
-[[INCREMENT .. DEPENDING FROM .. IN TABLE ..]]
+[[INCREMENT .. DEPENDING FROM .. IN TABLE]]
 
 [[SET .. TO]]
 
