@@ -6,7 +6,7 @@ Nehmen wir an, dass eine Tabelle ADDRESS Adressdaten enthält. In ADDRESS findet
 
 Die Verwendung von FETCH bedarf der vorherigen Benutzung des Befehls [[DBPARAMS - (de)]]. mk-sql-data versucht dann, die relationalen Daten in der Datenbank auszulesen mit dem SELECTSTATEMENT.
 
-Es ist möglich in der FIELDLIST mehr als einen Spaltennamen zu verwenden.
+Es ist möglich, in der FIELDLIST mehr als einen Spaltennamen zu verwenden.
 
 ## Syntax:
 ```
