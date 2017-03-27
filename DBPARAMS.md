@@ -1,6 +1,6 @@
 ## Explanation
 
-DBPARMS configures the credentials and establishes a database connection to the server. Only the [[FETCH .. USING]] parameter and the [[INCREMENT .. DEPENDING ON .. IN TABLE]] parameter need a connection to the target database.
+DBPARAMS configures the credentials and establishes a database connection to the database server. Only the [[FETCH .. USING]] parameter and the [[INCREMENT .. DEPENDING ON .. IN TABLE]] parameter need a connection to the target database.
 
 ## Syntax:
 ```
