@@ -40,7 +40,7 @@
 #		<FIELDNAME> := <delimiter> <FIELD_NAME> <delimiter>
 #		<TABLENAME> := <delimiter> <TABLE_NAME> <delimiter>
 #
-#	increment <FIELDNAME> depending from <FIELDLIST>;
+#	increment <FIELDNAME> depending on <FIELDLIST>;
 #
 #	dbparams = <delimiter> <localhost>,<schema_name>,<user_name>,<user_password>
 #		will not be resetted after declaration!
@@ -164,7 +164,7 @@ fetch 'ID_MANDANT,ID_BUCHUNGSKREIS' using "select ID_MANDANT,ID_BUCHUNGSKREIS fr
 fetch 'ID_COUNTRY' using 'select country_id from countries';
 fetch 'ID_CITY' using `select ID_CITY from fk_city`;
 
-increment 'ID_ADDRESS' depending from 'ID_MANDANT, ID_BUCHUNGSKREIS';
+increment 'ID_ADDRESS' depending on 'ID_MANDANT, ID_BUCHUNGSKREIS';
 
 
 run the export;

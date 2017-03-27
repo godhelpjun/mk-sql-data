@@ -1122,7 +1122,7 @@ class cCommand {
 		$this->GetCh( );
 // 		$content .= $zeichen;
 // 	    if ( $this->m_chr != $zeichen ) echo "\n Warning: ScanUntilFolgezeichen( ) endet auf '$this->m_chr'";
-	    $this->GetCh( );
+// 	    $this->GetCh( );
 	    assert( $this->m_chr != $zeichen );
 
 	}
@@ -1625,7 +1625,12 @@ class cCommand {
 	    }
 
 	    $this->SkipSpaces( );
-	    $token = $this->ScanToken( ) ;
+
+	    if ( $this->FollowsDelimiter( ) ) {
+		$this->GetTextBetweenDelimiters( $field_name );
+	    } else {
+		$token = $this->ScanToken( ) ;
+	    }
 
 	    $table_name = $token;
 
@@ -1678,7 +1683,7 @@ class cCommand {
 
 		$this->SkipSpaces( );
 
-		if ( strtoupper ( $this->NextToken( ) ) != 'FROM' ) die( "\n INCREMENT DEPENDING without FROM" );
+		if ( strtoupper ( $this->NextToken( ) ) != 'ON' ) die( "\n INCREMENT DEPENDING without ON" );
 
 		// 'DEPENDING' überspringen
 
@@ -1891,7 +1896,12 @@ class cCommand {
 	    }
 
 	    $this->SkipSpaces( );
-	    $token = $this->ScanToken( ) ;
+
+	    if ( $this->FollowsDelimiter( ) ) {
+		$this->GetTextBetweenDelimiters( $field_name );
+	    } else {
+		$token = $this->ScanToken( ) ;
+	    }
 
 	    $table_name = $token;
 
@@ -1944,7 +1954,12 @@ class cCommand {
 	    }
 
 	    $this->SkipSpaces( );
-	    $token = $this->ScanToken( );
+
+	    if ( $this->FollowsDelimiter( ) ) {
+		$this->GetTextBetweenDelimiters( $token );
+	    } else {
+		$token = $this->ScanToken( );
+	    }
 
 	    if ( $token === '' ) {
 		die ( "\n Program crashed: WORK ON TABLE without table" );
@@ -2107,7 +2122,12 @@ class cCommand {
 	    $token = $this->ScanToken( );
 
 	    $this->SkipSpaces( );
-	    $token = $this->ScanToken( );
+
+	    if ( $this->FollowsDelimiter( ) ) {
+		$this->GetTextBetweenDelimiters( $token );
+	    } else {
+		$token = $this->ScanToken( );
+	    }
 
 	    if ( $token == '' ) {
 		die ( "\n Program crashed: USE without column name" );
@@ -2142,7 +2162,12 @@ class cCommand {
 	    $token = $this->ScanToken( );
 
 	    $this->SkipSpaces( );
-	    $token = $this->ScanToken( );
+
+	    if ( $this->FollowsDelimiter( ) ) {
+		$this->GetTextBetweenDelimiters( $token );
+	    } else {
+		$token = $this->ScanToken( );
+	    }
 
 	    if ( $token == '' ) {
 		die ( "\n Program crashed: SET without column name" );
@@ -2154,13 +2179,13 @@ class cCommand {
 	    $token = strtoupper( $this->ScanToken( ) );
 
 	    if ( $token != 'TO' ) {
-		die ( "\n Program crashed: SET without TO" );
+		die ( "\n Program crashed: SET without TO ( got {$token} ) in \n $this->m_command" );
 	    }
 
 	    $this->SkipSpaces( );
 	    // $token = strtoupper( $this->ScanToken( ) );
 
-	    if ( $this->m_chr == '"' ) {
+	    if ( $this->FollowsDelimiter( ) ) {
 
 /*
 		if ( $this->m_chr == '"' ) {

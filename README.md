@@ -73,6 +73,10 @@ Import the generated SQL file into the database with
 The app mk-sql-data is licensed under the terms of the MIT
 license.
 
+Get more information by reading the project wiki
+
+  https://github.com/rstoetter/mk-sql-data/wiki
+
 Thank you for reading and using this part of software!
 
 Greets,
@@ -158,6 +162,10 @@ geben Sie ein:
     mysql -u Benutzer -pPasswort Datenbank < data.sql
 
 Das Programm mk-sql-data hat eine MIT-Lizenz.
+
+Weiterführende Informationen finden sich im Projekt-Wiki
+
+  https://github.com/rstoetter/mk-sql-data/wiki
 
 Vielen Dank, dass Sie sich die Zeit fürs Lesen genommen
 haben und dafür, dass Sie diese Software nutzen möchten!

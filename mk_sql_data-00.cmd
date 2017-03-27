@@ -18,7 +18,7 @@
 #
 #	work on table <TABLENAME>;
 #
-#	read {PRENAMES|SURNAMES|STREETS|ZIPCODES} from <TEXTFILENAME>;
+#	read {PRENAMES|SURNAMES|STREETS|ZIPCODES|TEXT} from <TEXTFILENAME>;
 #		the files have 1 column zip except the file with the zipcodes, which has 2 columns
 #		you can load more than one file per pattern. the new records will be added to the current ones
 #
@@ -40,7 +40,7 @@
 #		<FIELDNAME> := <delimiter> <FIELD_NAME> <delimiter>
 #		<TABLENAME> := <delimiter> <TABLE_NAME> <delimiter>
 #
-#	increment <FIELDNAME> depending from <FIELDLIST>;
+#	increment <FIELDNAME> depending on <FIELDLIST>;
 #
 #	dbparams = <delimiter> <localhost>,<schema_name>,<user_name>,<user_password>
 #		will not be resetted after declaration!
@@ -133,60 +133,61 @@ read text from "data/de-text.txt";
 filename is "output/random-data.sql";
 
 # delete all records from the table ADRESSE
-delete clause for ADRESSE is "";
-do delete from ADRESSE;
+delete clause for "ADRESSE" is "";
+do delete from "ADRESSE";
 
-work on table ADRESSE;
+work on table "ADRESSE";
 
 start with record 0;
 
 export 1000 records;
 
-set REVDATE to sql "NOW( )";
-set REVFIRST to randomized DATETIME IN PAST;
-use REVCREATOR as surname;
-use REVNAME as surname;
+set "REVDATE"  to sql "NOW( )";
+set "REVFIRST" to randomized DATETIME IN PAST;
+use "REVCREATOR" as surname;
+use "REVNAME" as surname;
 
-use PLZ as zipcode;
-use Name as surname;
-use Vorname as prename;
-use Strasse as street;
+use "PLZ" as zipcode;
+use "Name" as surname;
+use "Vorname" as prename;
+use "Strasse" as street;
 use Ort as city;
 use ID_ADRESSE as unique;
-set ID_MANDANT to "1";
-set ID_BUCHUNGSKREIS to "1";
-# Germany is 83
-set ID_COUNTRY to "83";
 
-set Telefon to randomized phone;
-set _Datetime_1 to randomized DATETIME ;
-set _Datetime_2 to randomized DATETIME IN PAST;
-set _Datetime_3 to randomized DATETIME IN PAST;
-set _Datetime_4 to randomized DATETIME IN PAST;
-set _Datetime_5 to randomized DATETIME IN PAST;
-set _Datetime_6 to randomized DATETIME IN FUTURE;
-set _Date_1 to randomized DATE IN PAST;
-set _Date_2 to randomized DATE IN PAST;
-set _Date_3 to randomized DATE IN PAST;
-set _Date_4 to randomized DATE IN PAST;
-set _Date_5 to randomized DATE IN PAST;
-set _Date_6 to randomized DATE IN FUTURE;
-set _Time_1 to randomized TIME IN FUTURE;
-set _Time_2 to randomized TIME IN PAST;
-set _Time_3 to randomized TIME IN PAST;
-set _Time_4 to randomized TIME IN PAST;
-set _Time_5 to randomized TIME IN PAST;
-set _Time_6 to randomized TIME IN PAST;
-set _Float_1 to randomized FLOAT ;
-set _Float_2 to randomized FLOAT between 0.58 and 15.75;
-set _Int_1 to randomized INT between 1 and 31000;
-set _Bool_1 to randomized BOOLEAN ;
-set _Char_1 to randomized Char between 0 and 50;
-set _Char_2 to randomized Char between 0 and 150;
-set _IBAN_1 to randomized IBAN;
-set _BIC_1 to randomized BIC;
-set _YEAR_1 to randomized INT between 1901 and 2155;
-set _YEAR_2 to randomized INT between 1901 and 2155;
+set "ID_MANDANT" to "1";
+set "ID_BUCHUNGSKREIS" to "1";
+# Germany is 83
+set "ID_COUNTRY" to "83";
+
+set "Telefon to randomized phone;
+set "_Datetime_1" to randomized DATETIME ;
+set "_Datetime_2" to randomized DATETIME IN PAST;
+set "_Datetime_3" to randomized DATETIME IN PAST;
+set "_Datetime_4" to randomized DATETIME IN PAST;
+set "_Datetime_5" to randomized DATETIME IN PAST;
+set "_Datetime_6" to randomized DATETIME IN FUTURE;
+set "_Date_1" to randomized DATE IN PAST;
+set "_Date_2" to randomized DATE IN PAST;
+set "_Date_3" to randomized DATE IN PAST;
+set "_Date_4" to randomized DATE IN PAST;
+set "_Date_5" to randomized DATE IN PAST;
+set "_Date_6" to randomized DATE IN FUTURE;
+set "_Time_1" to randomized TIME IN FUTURE;
+set "_Time_2" to randomized TIME IN PAST;
+set "_Time_3" to randomized TIME IN PAST;
+set "_Time_4" to randomized TIME IN PAST;
+set "_Time_5" to randomized TIME IN PAST;
+set "_Time_6" to randomized TIME IN PAST;
+set "_Float_1" to randomized FLOAT ;
+set "_Float_2" to randomized FLOAT between 0.58 and 15.75;
+set "_Int_1" to randomized INT between 1 and 31000;
+set "_Bool_1" to randomized BOOLEAN ;
+set "_Char_1" to randomized Char between 0 and 50;
+set "_Char_2" to randomized Char between 0 and 150;
+set "_IBAN_1" to randomized IBAN;
+set "_BIC_1" to randomized BIC;
+set "_YEAR_1" to randomized INT between 1901 and 2155;
+set "_YEAR_2" to randomized INT between 1901 and 2155;
 
 # MEDIUMTEXT stores up to 16777215 Bytes ( 16 MB )
 # 64 KB = 65535 Bytes
@@ -195,8 +196,8 @@ set _YEAR_2 to randomized INT between 1901 and 2155;
 #  8 KB = 8192 Bytes
 #  4 KB = 4096 Bytes
 
-set _MEDIUM_TEXT_1 to randomized Char between 0 and 8192;
-set _MEDIUM_TEXT_2 to randomized Char between 0 and 4096;
+set "_MEDIUM_TEXT_1" to randomized Char between 0 and 8192;
+set "_MEDIUM_TEXT_2" to randomized Char between 0 and 4096;
 
 run the export;
 
@@ -219,11 +220,12 @@ use Vorname as prename;
 use Strasse as street;
 use Ort as city;
 use ID_ADRESSE as unique;
-set ID_MANDANT to "1";
-set ID_BUCHUNGSKREIS to "1";
+
+set "ID_MANDANT" to "1";
+set "ID_BUCHUNGSKREIS" to "1";
 # United States of America is 236
-set ID_COUNTRY to "236";
-set Telefon to randomized phone;
+set "ID_COUNTRY" to "236";
+set "Telefon" to randomized phone;
 
 # append 1000 records to the export file
 
