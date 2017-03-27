@@ -11,6 +11,6 @@ THE WORK command tells mk-sql-data for which table it should now generate the fo
 ## Example:
 
 ```
-   work on table CLERKS;
+   work on table "CLERKS";
 ```
 
