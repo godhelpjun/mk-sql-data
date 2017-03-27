@@ -1,6 +1,6 @@
 ## Explanation
 
-DO DELETE FROM writes a SQL DELETE to the SQL File and an optional WHERE clause, which was defined with [[DELETE FOR .. IS]] .
+DO DELETE FROM writes a SQL DELETE to the SQL File and an optional WHERE clause, which was defined with [[DELETE CLAUSE FOR]] .
 
 ## Syntax:
 
@@ -8,18 +8,18 @@ DO DELETE FROM writes a SQL DELETE to the SQL File and an optional WHERE clause,
   do delete from <TABLENAME> 
 ```
 ## See also
-   [[DELETE FOR .. IS]]
+   [[DELETE CLAUSE FOR]]
 
 ## Example:
 
 ```
-   delete for "mytable" is "";
+   delete clause for "mytable" is "";
    do delete from "mytable";
 
-   delete for "tbl" is "where x1 = 15;"
+   delete clause for "tbl" is "where x1 = 15;"
    do delete  from "tbl";
 
-   delete for "clerks" is "where ID_MANDANT in (select * from MANDANT where Name = 'Mandant 1');";
+   delete clause for "clerks" is "where ID_MANDANT in (select * from MANDANT where Name = 'Mandant 1');";
    do delete from "BUCHUNGSKREIS";
 ```
 
