@@ -8,7 +8,7 @@ DO DELETE FROM schreibt ein SQL DELETE in die SQL-Datei samt einer optionalen WH
   do delete from <TABLENAME> 
 ```
 ## See also
-   [[DO DELETE FROM - (de)]]
+   [[DELETE CLAUSE FOR - (de)]]
 
 ## Example:
 
