@@ -5,7 +5,7 @@ Der SET-befehl weist mk-sql-data an, mit welchem Wert das Programm den Inhalt ei
 ```
    set <FIELDNAME> TO <VALUE>;
 ```
-Detzt den Spaltenwert auf einen bestimmten Wert.
+Setzt den Spaltenwert auf einen bestimmten Wert.
 
 ```
    set <FIELDNAME> TO  RANDOMIZED {DATE|DATETIME|TIME} [IN {PAST|FUTURE}];
