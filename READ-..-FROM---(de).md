@@ -6,6 +6,30 @@ Die meisten der Textdateien bestehen aus einer Textspalte. Die ZIPCODES bestehen
 
 Es ist möglich, mehr als eine Datei zu laden; die neuen Datensätze werden einfach an die schon eingelesenen Daten angehängt. Mit [[RESET - (de)]] können eingelesene Daten wieder aus dem Speicher entfernt werden.
 
+### Available data sets
+
+Deutsche Daten:
+   data/de-prenames.txt
+   data/de-surnames.txt
+   data/de-streets.txt
+   data/de-zips.txt
+   data/de-text.txt 
+
+Englische Daten:
+   data/us-prenames.txt
+   data/us-surnames.txt
+   data/us-streets.txt
+   data/us-zips.txt
+   data/us-text.txt 
+
+Spanische Daten:
+   data/es-prenames.txt
+   data/es-surnames.txt
+   data/es-streets.txt
+   data/es-zips.txt
+   data/es-text.txt 
+
+
 ## Syntax:
 
 ```
@@ -15,6 +39,8 @@ Es ist möglich, mehr als eine Datei zu laden; die neuen Datensätze werden einf
 ## Beispiel:
 
 ```
+   # lade alle verfügbaren deutschen Daten
+
    read prenames from "data/de-prenames.txt";  # Vornamen
    read surnames from "data/de-surnames.txt";  # Nachnamen
    read streets from "data/de-streets.txt";    # Straßemverzeichnis
