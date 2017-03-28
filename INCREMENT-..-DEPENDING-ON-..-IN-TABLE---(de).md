@@ -7,7 +7,7 @@ Nehmen wir etwa an, wir haben eine Applikation erstellt, welche Mandanten und Bu
    increment 'ID_ADRESSE' depending on 'ID_MANDANT, ID_BUCHUNGSKREIS';
 ```
 
-Um INCREMENT benutzen zu können, ist zunächst [[DBPARAMS]] zu definieren.
+Um INCREMENT benutzen zu können, ist zunächst [[DBPARAMS - (de)]] zu definieren.
 
 In der Feldliste FIELDLIST kann mehr als ein Spaltenname stehen.
 
