@@ -15,7 +15,7 @@ Sets the date or time column value to a randomized value. Optionally you can dec
 ```
    set <FIELDNAME> TO  RANDOMIZED {PHONE|BLZ|IBAN|BIC};
 ```
-Sets the column value to a randomized value. It can be a phone number, a BIC code, a BIC code or a former German Bankleitzahl.
+Sets the column value to a randomized value. It can be a phone number, a BIC code, an IBAN code or a former German Bankleitzahl.
 
 ```
    set <FIELDNAME> TO  RANDOMIZED {FLOAT|INT|BOOL} [BETWEEN <VALUE>  AND <VALUE>];
