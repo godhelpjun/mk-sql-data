@@ -15,7 +15,6 @@ In der Feldliste FIELDLIST kann mehr als ein Spaltenname stehen.
 
 ```
    increment <FIELDNAME> depending on <FIELDLIST>;
-  
 ```
 
 ## Beispiel:
