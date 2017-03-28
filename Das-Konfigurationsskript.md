@@ -1,5 +1,5 @@
 
-Die Konfigurationdatei beinhaltet die einzelnen Befehle, von mk-sql-data interpretiert und abgearbeitet werden. Die Befehle sind in einem leicht verständlichen Pseudoenglisch gehalten und damit selbsterklärend.
+Die Konfigurationdatei beinhaltet die einzelnen Befehle, welche von mk-sql-data interpretiert und abgearbeitet werden. Die Befehle sind in einem leicht verständlichen Pseudoenglisch gehalten und damit selbsterklärend.
 
 Manche der Kommandos werden sofort ausgeführt und andere wiederum erst nach einem initialen [[RUN THE EXPORT - (de) ]]:
 
