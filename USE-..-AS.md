@@ -1,6 +1,6 @@
 ## Explanation
 
-THE USE command tells mk-sql-data, how to use a column
+THE USE command tells mk-sql-data, how to use a column and how to randomize special columns.
 
 ```
    use <FIELDNAME> AS {PRENAME|SURNAME|STREET|ZIPCODE};
@@ -20,7 +20,9 @@ Treat the column as unique number
    use <FIELDNAME> AS {PRENAME|SURNAME|STREET|ZIPCODE|UNIQUE};
 ```
 
-See the [[SET .. TO]] command, too.
+== See also
+
+[[SET .. TO]]
 
 ## Example:
 
@@ -30,6 +32,6 @@ See the [[SET .. TO]] command, too.
    use "PRENAME" as prename;
    use "STREET" as street;
    use "CITY" as city;
-   use "ID_ADRESSE" as unique;
+   use "ID_ADDRESS" as unique;
 ```
 
