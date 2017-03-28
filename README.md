@@ -6,9 +6,10 @@ written in English and in German / deutsch
 #####################################################
 
 mk-sql-data is a CLI (command line interface) app
-written in PHP. It's aim is to give programmers the
-possibility, to generate even large amounts of testing
-data for MySQL- databases on the fly.
+written in PHP. It is a test data generator. It's aim
+is to give programmers the possibility, to generate
+even large amounts of testing data for MySQL- databases
+on the fly.
 
 The generation of test data is a boring and time-
 consuming matter. Automatic solutions often fill the
@@ -89,7 +90,8 @@ Rainer Stötter, Altenburg, Germany
 
 mk-sql-data ist eine CLI-Applikation ( command line
 interface ), welche in PHP programmiert worden ist.
-Das Programm soll Entwicklern die Möglichkeit geben, auf
+Es handelt sich um einen Testdatengenerator. Das
+Programm soll Entwicklern die Möglichkeit geben, auf
 die Schnelle sogar große Mengen an Testdaten für eine
 MySQL-Datenbank zu erzeugen.
 

@@ -1918,21 +1918,7 @@ class cCommand {
 		$zeichen = $this->ActCh( );
 
 		// zunächst die Feldliste einlesen
-/*
-		// überspringe das Startzeichen
-		$this->GetCh( );
 
-		if ( $zeichen == '"' ) {
-		    $field_name = $this->ScanUntilFolgezeichen( $zeichen );
-		} elseif ( $zeichen == "'" ) {
-		    $field_name = $this->ScanUntilFolgezeichen( $zeichen );
-		} elseif ( $zeichen == '`' ) {
-		    $field_name = $this->ScanUntilFolgezeichen( $zeichen );
-		} else {
-		    die( "\n Abbruch: kein valider Delimiter nach 'INCREMENT' ({$str_fields})" );
-		}
-
-*/
 		$this->GetTextBetweenDelimiters( $field_name );
 
 		if ( strtoupper ( $this->NextToken( ) ) != 'DEPENDING' ) die( "\n INCREMENT without DEPENDING" );
@@ -1951,35 +1937,13 @@ class cCommand {
 
 		$this->SkipSpaces( );
 
-		// die Feldliste einlesen
-
-/*
-		$zeichen = $this->ActCh( );
-
-		// überspringe das Startzeichen
-		$this->GetCh( );
-
-		if ( $zeichen == '"' ) {
-		    $str_increment = $this->ScanUntilFolgezeichen( $zeichen );
-		} elseif ( $zeichen == "'" ) {
-		    $str_increment = $this->ScanUntilFolgezeichen( $zeichen );
-		} elseif ( $zeichen == '`' ) {
-		    $str_increment = $this->ScanUntilFolgezeichen( $zeichen );
-		} else {
-		    die( "\n Abbruch: kein valider Delimiter nach 'FETCH' ({$str_fields})" );
-		}
-
-		// überspringe das Endzeichen
-*/
+		// die zweite Feldliste einlesen
 
 		$this->GetTextBetweenDelimiters( $str_increment );
 
 		$a_increment_vars = explode( ',', $str_increment );
 
 		foreach( $a_increment_vars as & $var ) { $var = trim( $var ); }
-
-
-//	    }
 
 	    // eventuell noch Feldvariablen ersetzen?
 
@@ -2015,29 +1979,6 @@ class cCommand {
 	    $str_sql = '';
 	    $fertig = false;
 
-/*
-	    $zeichen = $this->ActCh( );
-
-	    // zunächst die Feldliste einlesen
-
-
-
-	    // überspringe das Startzeichen
-	    $this->GetCh( );
-
-	    if ( $zeichen == '"' ) {
-		$str_fields = $this->ScanUntilFolgezeichen( $zeichen );
-	    } elseif ( $zeichen == "'" ) {
-		$str_fields = $this->ScanUntilFolgezeichen( $zeichen );
-	    } elseif ( $zeichen == '`' ) {
-		$str_fields = $this->ScanUntilFolgezeichen( $zeichen );
-	    } else {
-		die( "\n Abbruch: kein valider Delimiter nach 'FETCH' ({$str_fields})" );
-	    }
-
-	    // überspringe das Endzeichen
-// 	    $this->GetCh( );
-*/
 	    $this->GetTextBetweenDelimiters( $str_fields );
 
 	    $a_fields = explode( ',', $str_fields );
@@ -2053,24 +1994,6 @@ class cCommand {
 
 	    // read the sql-command
 	    $this->SkipSpaces( );
-/*
-	    $zeichen = $this->ActCh( );
-
-	    // überspringe das Startzeichen
- 	    $this->GetCh( );
-
-	    if ( $zeichen == '"' ) {
-		$str_sql = $this->ScanUntilFolgezeichen( $zeichen );
-	    } elseif ( $zeichen == "'" ) {
-		$str_sql = $this->ScanUntilFolgezeichen( $zeichen );
-	    } elseif ( $zeichen == '`' ) {
-		$str_sql = $this->ScanUntilFolgezeichen( $zeichen );
-	    } else {
-		die( "\n Abbruch: kein valider Delimiter nach 'USING' ('{$zeichen}') next token = " . $this->NextToken( ) );
-	    }
-
-	    $this->SkipSpaces( );
-*/
 
 	    $this->GetTextBetweenDelimiters( $str_sql );
 
@@ -2116,29 +2039,14 @@ class cCommand {
 	    $this->SkipSpaces( );
 
 	    // Parameter einlesen
-/*
-	    $zeichen = $this->m_chr;
 
-	    // überspringe das Startzeichen
-  	    $this->GetCh( );
-
-	    if ( $zeichen == '"' ) {
-		$params = $this->ScanUntilFolgezeichen( $zeichen );
-	    } elseif ( $zeichen == "'" ) {
-		$params = $this->ScanUntilFolgezeichen( $zeichen );
-	    } elseif ( $zeichen == '`' ) {
-		$params = $this->ScanUntilFolgezeichen( $zeichen );
-	    } else {
-		die( "\n Abbruch: kein valider Delimiter nach 'DBPARAMS =' ( '{$zeichen}' )" );
-	    }
-*/
 
 	    $this->GetTextBetweenDelimiters( $params );
 
 	    // überspringe das Endzeichen
 	    $this->SkipSpaces( );
 
-	    //
+	    // ask the user for missing credentials
 
 	    $obj_command_database_params = new cCommandDatabaseParams( $params );
 	    $this->m_mysqli = $obj_command_database_params->GetOpenedDatabase( );
