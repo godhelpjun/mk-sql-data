@@ -75,6 +75,133 @@ cTestdatenGenerator:: (4 methods):
   WriteHeader()
 */
 
+class cCredentialsReader {
+
+    //
+    // reads the credentials of the database from the command line
+    //
+
+    public $m_host_name = '';
+    public $m_schema_name = '';
+    public $m_user_name = '';
+    public $m_user_password = '';
+
+    protected $m_host_name_org = '';
+    protected $m_schema_name_org = '';
+    protected $m_user_name_org = '';
+    protected $m_user_password_org = '';
+
+    function __construct( $host_name, $schema_name, $user_name, $user_password ) {
+
+	$this->m_host_name = $this->m_host_name_org = $host_name;
+	$this->m_schema_name = $this->m_schema_name_org = $schema_name;
+	$this->m_user_name = $this->m_user_name_org = $user_name;
+	$this->m_user_password = $this->m_user_password_org = $user_password;
+
+	$this->ReadCredentials( );
+
+    }	// function __construct( )
+
+    protected function ReadLine( $prompt = "\n $:" ) {
+
+	// PHP CLI normally is installed witout the readline library!
+
+
+	if ( PHP_OS == 'WINNT' ) {
+
+	    echo $prompt;
+
+	    $line = stream_get_line( STDIN, 1024, PHP_EOL );
+
+	} else {
+
+	    echo $prompt;
+
+	    $line = stream_get_line( STDIN, 1024, PHP_EOL );
+
+	    //$line = readline( $prompt );
+
+	}
+
+	return $line;
+
+    }	// function ReadLine( )
+
+    function ReadPassword( $prompt = "Enter Password:" ) {
+
+      // from http://stackoverflow.com/questions/187736/command-line-password-prompt-in-php
+
+      if (preg_match('/^win/i', PHP_OS)) {
+
+	$vbscript = sys_get_temp_dir() . 'prompt_password.vbs';
+
+	file_put_contents(
+	  $vbscript, 'wscript.echo(InputBox("'
+	  . addslashes($prompt)
+	  . '", "", "password here"))');
+
+	$command = "cscript //nologo " . escapeshellarg($vbscript);
+
+	$password = rtrim(shell_exec($command));
+
+	unlink($vbscript);
+
+	return $password;
+
+      } else {
+
+	$command = "/usr/bin/env bash -c 'echo OK'";
+
+	if (rtrim(shell_exec($command)) !== 'OK') {
+	  trigger_error("Cannot invoke bash");
+	  return;
+	}
+
+	$command = "/usr/bin/env bash -c 'read -s -p \""
+	  . addslashes($prompt)
+	  . "\" mypassword && echo \$mypassword'";
+
+	$password = rtrim( shell_exec( $command ) );
+
+	echo "\n";
+
+	return $password;
+
+      }
+    }    // function ReadPassword( )
+
+    protected function ReadCredentials( & $host, & $schema, & $user, & $password ) {
+
+	$host = $this->m_host_name_org;
+	$schema = $this->m_schema_name_org;
+	$user = $this->m_user_name_org;
+	$password = $this->m_user_password_org;
+
+	while ( ! strlen( trim( $host ) ) ) {
+	    $host = $this->ReadLine( "\n the database host is : " );
+	}
+
+	while ( ! strlen( trim( $schema ) ) ) {
+	    $schema = $this->ReadLine( "\n the database schema ( database name ) is : " );
+	}
+
+	while ( ! strlen( trim( $user ) ) ) {
+	    $user = $this->ReadLine( "\n the database user is : " );
+	}
+
+	while ( ! strlen( trim( $password ) ) ) {
+	    $password = $this->ReadPassword( "\n the password of the database user is : " );
+	}
+
+	$this->m_host_name = $host;
+	$this->m_schema_name = $schema;
+	$this->m_user_name = $user;
+	$this->m_user_password = $password;
+
+    }	// function ReadCredentials( )
+
+}	// class cCredentialsReader
+
  class cColorsCLI {
 
 	// a good idea of agarzon - https://gist.github.com/agarzon
@@ -349,20 +476,65 @@ class cCommandDatabaseParams {
 
     }	// __construct( )
 
+    protected function ReadCredentials( ) {
+
+	$host_name = $this->m_host_name;
+	$schema_name = $this->m_schema_name;
+	$user_name = $this->m_user_name;
+	$user_password = $this->m_user_password;
+
+	$mysqli = null;
+
+	do {
+
+	    $obj_credentials = new cCredentialsReader( $host_name, $schema_name, $user_name, $user_password );
+
+	    echo "\n trying to connect to the database server";
+
+	    $mysqli = new mysqli(
+		$obj_credentials->m_host_name,
+		$obj_credentials->m_user_name,
+		$obj_credentials->m_user_password,
+		$obj_credentials->m_schema_name
+	    );
+
+	    echo " .. finished";
+
+	    if ( $mysqli === false ) {
+
+		echo "\n wrong credentials - try again!";
+
+	    } else {
+
+		echo "\n success connecting to database";
+
+	    }
+
+	    if ($mysqli->connect_error) {
+		echo('Connect Error (' . $mysqli->connect_errno . ') '. $mysqli->connect_error);
+	    }
+
+	} while( $mysqli->connect_error );
+
+	// $m_mysqli->close( );
+
+	$this->m_host_name = $host_name;
+	$this->m_schema_name = $schema_name;
+	$this->m_user_name = $user_name;
+	$this->m_user_password = $user_password;
+
+	return $mysqli;
+
+    }	// function ReadCredentials( )
+
+
     function __destruct( ) {			// cCommand
 
     }	// function __destruct( )
 
     public function GetOpenedDatabase( ) {
 
-	$mysqli = new mysqli(
-
-            $this->m_host_name,
-            $this->m_user_name,
-            $this->m_user_password,
-            $this->m_schema_name
-
-        );
+	$mysqli = $this->ReadCredentials( );
 
         if ( $mysqli === false ) {
 
@@ -370,9 +542,11 @@ class cCommandDatabaseParams {
 
         }
 
+        assert( is_a( $mysqli, 'mysqli' ) );
+
         return $mysqli;
 
-    }	// func_get_args GetOpenedDatabase( )
+    }	// function GetOpenedDatabase( )
 
 }	// class cCommandDatabaseParams
 
@@ -665,6 +839,13 @@ class cCommand {
 
     protected $m_a_fetched = array( );		// FETCH-Ergebnisse mit Objekten vom Typ cCommandFetch
 
+    // the database credentials
+
+    protected $m_host_name = '';
+    protected $m_schema_name = '';
+    protected $m_user_name = '';
+    protected $m_user_password = '';
+
     protected function ResetData( ) {
 
       $this->m_a_prenames = array( );		// Die importierten Vornamen
@@ -674,6 +855,7 @@ class cCommand {
       $this->m_long_text = '';			// Der Langtext
 
     }	// function ResetData( )
+
 
     protected function FollowsDelimiter( ) {
 
@@ -971,6 +1153,9 @@ class cCommand {
 	return $this->m_chr == '';
 
     }	// function IsDone( )
+
+
+
 
     protected function ImportTheTextdata( $file_name, $anzahl_spalten, & $ary ) {
 

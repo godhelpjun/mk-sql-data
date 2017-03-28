@@ -108,7 +108,8 @@ reset actions;
 
 filename is "output/random-fk.sql";
 
-dbparams = "localhost,db2phpsite_test,db2phpsite,db2phpsite";
+# ask for user name and user password
+dbparams = "localhost,db2phpsite_test,,";
 
 read surnames from "data/de-surnames.txt";
 read prenames from "data/de-prenames.txt";

@@ -145,7 +145,7 @@ testen mit dem Befehl
     mk-sql-data.php --cfg mk-sql-data-00.cmd
 
 mk-sql-data läuft bei mir in einer Linux-Umgebung mit
-installiertem PHP 5, sollte jedoch auf auf anderen
+installiertem PHP 5, sollte jedoch auch auf anderen
 Plattformen lauffähig sein. Sollten Sie das Programm
 erfolgreich unter einem anderen Betriebssystem zum Laufen
 gebracht haben, dann informieren Sie mich bitte darüber.
