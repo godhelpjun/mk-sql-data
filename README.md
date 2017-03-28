@@ -32,9 +32,9 @@ command, a database connection is necessary. The FETCH-
 command selects relational data out of the database. See
 mk-sql-data-01.cmd as sample configuration.
 
-At the moment the app supports two target types of test
-data; it was designed for English and German users. You
-are welcome to support me by providing sample data of
+At the moment the app supports three target types of test
+data; it was designed for English, Spanish and German users.
+You are welcome to support me by providing sample data of
 your country in order to enlarge the community which can
 use mk-sql-data. Send me please
 
@@ -118,11 +118,11 @@ Datenbank in Kontakt treten, weil relationale Daten
 abgefragt werden müssen. Siehe hierzu das Beispielskript
 mk-sql-data-01.cmd
 
-Derzeit unterstützt die Applikation zwei Typen von
-Testdaten - solche für den englischsprachigen Raum und
-solche für den deutschsprachigen. Wenn Sie gerne eine
-weitere Zielgruppe versorgt sehen möchten, dann sind
-Sie gerne dazu eingeladen, mich zu unterstützen, indem
+Derzeit unterstützt die Applikation drei Typen von
+Testdaten - solche für den englischsprachigen Raum,
+spanische Daten, und solche für den deutschsprachigen Raum.
+Wenn Sie gerne eine weitere Zielgruppe versorgt sehen möchten,
+dann sind Sie gerne dazu eingeladen, mich zu unterstützen, indem
 Sie mir Beispieldaten des Ziellandes zur Verfügung
 stellen. Um nun noch mehr Menschen die Generierung von
 Testdaten zu ermöglichen, senden Sie mir bitte
