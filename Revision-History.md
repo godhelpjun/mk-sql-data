@@ -4,4 +4,5 @@
 - 2017-03-27 First GitHub version published
 - 2017-03-27 Minor changes
 - 2017-03-27 Wiki pages https://github.com/rstoetter/mk-sql-data/wiki
+- 2017-03-28 asking now the user for empty credentials
 
