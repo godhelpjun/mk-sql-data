@@ -12,5 +12,5 @@ Falls nicht alle Eintragungen benannt wurden, dann fragt mk-sql-data über einen
 ## Beispiel:
 ```
   dbparams = "localhost,db2phpsite,db2phpsite,db2phpsite";
-  dbparams = "localhost,db2phpsite";    # Benutzernamen und Passwort abfragen
+  dbparams = "localhost,db2phpsite,,";    # Benutzernamen und Passwort abfragen
 ```
