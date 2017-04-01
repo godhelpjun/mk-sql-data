@@ -10,4 +10,6 @@
 
 [[The configuration file]]
 
+[[Using the examples]]
+
 [[How to contribute to the project?]]
