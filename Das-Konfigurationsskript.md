@@ -13,9 +13,11 @@ Manche der Kommandos werden sofort ausgeführt und andere wiederum erst nach ein
 
 ## Sofort ausgeführte Befehle:
 
+[[DATABASE PROVIDER IS - (de)]]
+
 [[DBPARAMS - (de) ]]		
 
-[[DELETE CLAUSE FOR - (de) ]]
+[[DELETE CLAUSE FOR - (de)]]
 
 [[DO DELETE FROM - (de)]]
 
@@ -39,11 +41,11 @@ Manche der Kommandos werden sofort ausgeführt und andere wiederum erst nach ein
 
 [[FETCH .. USING - (de)]]
 
-[[INCREMENT .. DEPENDING ON .. IN TABLE - (de) ]]
+[[INCREMENT .. DEPENDING ON .. IN TABLE - (de)]]
 
-[[SET .. TO - (de) ]]
+[[SET .. TO - (de)]]
 
-[[USE .. AS - (de) ]]
+[[USE .. AS - (de)]]
 
 ## Beispielskripte
 
