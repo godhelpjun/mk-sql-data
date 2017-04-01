@@ -18,19 +18,7 @@ mysql -u db2phpsite -pdb2phpsite < output/random-data.sql
 
 # The script file mk-sql-data-02-ora.cmd
 
-This script file runs against an ORACLE database and creates relational test data. 
-
-```
-sqlplus64 /nolog
-
-connect db2phpsite/db2phpsite@192.168.1.65;
-```
-
-## Fill the database
-```
-@ './mk-sql-data-init-oracle.sql';
-exit;
-```
+This script file runs against an ORACLE database and creates relational test data. You have to change the CONNECT-string in order to fit to your environment
 
 ## Run the example script and create the test data
 ```
