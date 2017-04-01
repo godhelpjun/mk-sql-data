@@ -14,6 +14,7 @@ use db2phpsite;
 ```
 CREATE USER 'db2phpsite'@'localhost' IDENTIFIED BY 'db2phpsite'
 GRANT ALL ON db2phpsite.* TO 'db2phpsite'@'localhost';
+FLUSH PRIVILEGES;
 exit
 ```
 
