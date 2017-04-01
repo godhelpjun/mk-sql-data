@@ -34,6 +34,56 @@ mysql -u db2phpsite -pdb2phpsite < mk-sql-data-init-mysql.sql
 mysql -u db2phpsite -pdb2phpsite < output/random-data.sql
 ```
 
+# the script file mk-sql-data-02-ora.cmd
+
+This script file runs against an ORACLE database and creates relational test data. 
+
+
+## install oci8 for php after installing the instant client download from oracle
+
+the debian way:
+```
+pecl install oci8-2.0.10
+```
+
+## create a new user ( = schema )
+
+Use the program "sqlplus" in order to execute the SQL commands. sqlplus64 /nolog starts without connecting to a schema.
+```
+sqlplus64 /nolog
+
+CONNECT system/oracle@192.168.1.65/XE
+
+create user db2phpsite identified by "db2phpsite";
+
+grant dba,resource, connect to db2phpsite;
+
+connect db2phpsite/db2phpsite@192.168.1.65;
+```
+
+## Fill the database
+```
+@ './mk-sql-data-init-oracle.sql';
+exit;
+```
+
+## run the example script and create the test data
+```
+./mk-sql-data --cfg mk-sql-data-02-ora.cmd
+```
+
+## import the test data into our database
+```
+sqlplus64 /nolog
+
+connect db2phpsite/db2phpsite@192.168.1.65;
+@ 'output/random-fk.sql';
+```
+
+
+
+
+
 
 
 
