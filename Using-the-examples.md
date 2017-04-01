@@ -1,4 +1,4 @@
-Before you can use the following examples you have to prepare the following [[Prerequisites]]
+Before you can use the following examples you have to prepare things described here: [[Prerequisites]]
 
 # The script file mk-sql-data-01.cmd
 
