@@ -28,7 +28,8 @@ The CONNECT-string may vary depending on the Version and the location of the dat
 
 ## Install instantclient from ORACLE and sqlplus
 
-- go to the ORACLE website and search for INSTANTCLIENT
+- go to the ORACLE website and search for INSTANTCLIENT [INSTANT CLIENT]
+
 - download the base package from ORACLE website
 - download the sql plus package from ORACLE website
 - install the packages
