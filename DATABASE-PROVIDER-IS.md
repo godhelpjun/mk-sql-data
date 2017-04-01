@@ -5,7 +5,7 @@ the DATABASE PROVIDER command tells mk-sql-data which database is the target one
 
 ## Syntax:
 ```
-  database provider is [ "MYSQL" | "ORACLE" ]
+  database provider is [ "MYSQL" | "ORACLE" ];
 ```
 
 ## Example:
