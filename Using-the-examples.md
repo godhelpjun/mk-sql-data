@@ -26,7 +26,7 @@ mysql -u db2phpsite -pdb2phpsite < mk-sql-data-init-mysql.sql
 
 ## run the example script and create the test data
 ```
-./mk-sql-data --cfg mk-sql-data-01.cmd
+./mk-sql-data.php --cfg mk-sql-data-01.cmd
 ```
 
 ## import the test data into our database
@@ -69,7 +69,7 @@ exit;
 
 ## run the example script and create the test data
 ```
-./mk-sql-data --cfg mk-sql-data-02-ora.cmd
+./mk-sql-data.php --cfg mk-sql-data-02-ora.cmd
 ```
 
 ## import the test data into our database
