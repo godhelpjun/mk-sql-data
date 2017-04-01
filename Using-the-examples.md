@@ -1,5 +1,3 @@
-In order to use the examples you have to create a database / schema and a user, which owns this database/schema. then you can use the example files
-
 Before you can use the following examples you have to prepare the following [[Prerequisites]]
 
 # The script file mk-sql-data-01.cmd
