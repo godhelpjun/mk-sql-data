@@ -1,3 +1,5 @@
+In order to use examples which are connecting to the database have to create a database / schema and a user, which owns this database/schema. Then you will be able to use the example files
+
 # Using MySQL
 
 Use the program "mysql" in order to execute the SQL commands.
