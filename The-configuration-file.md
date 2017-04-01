@@ -13,6 +13,8 @@ There are commands, which are executed immediately and commands, which are execu
 
 ## immediate execution:
 
+[[DATABASE PROVIDER IS]]
+
 [[DBPARAMS]]		
 
 [[DELETE CLAUSE FOR]]
