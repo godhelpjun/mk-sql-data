@@ -81,4 +81,3 @@ connect db2phpsite/db2phpsite@192.168.1.65;
 @ './mk-sql-data-init-oracle.sql';
 exit;
 ```
-
