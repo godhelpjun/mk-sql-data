@@ -77,7 +77,7 @@ create table fk_city IF NOT EXISTS (
     REVFIRST                        DATETIME        NOT NULL ,
     REVCREATOR                      CHAR(20)        NOT NULL,
 
-  PRIMARY KEY ( ID_CITY ),
+  PRIMARY KEY ( ID_CITY )
 
 ) ENGINE=InnoDb CHARACTER SET utf8;
 

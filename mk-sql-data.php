@@ -75,6 +75,238 @@ cTestdatenGenerator:: (4 methods):
   WriteHeader()
 */
 
+
+class cOracleResultSmall {
+
+    // a basic subset of the oci operations hidden behind a class
+
+    protected $m_id_statement = null;
+    protected $m_fetch_mode = null;
+
+    public $num_rows = -1;
+
+    function __construct( $id_statement, $fetch_mode ) {
+
+	assert( is_resource( $id_statement ) );
+
+	$this->m_id_statement = $id_statement;
+	$this->m_fetch_mode = $fetch_mode;
+
+	 $this->num_rows = oci_num_rows( $this->m_id_statement );
+
+    }	// function __destruct( )
+
+    function __destruct( ) {
+
+    }	// function __destruct( )
+
+    public function fetch_array( ){
+        return oci_fetch_array($this->m_id_statement, $this->m_fetch_mode);
+    }
+
+    public function fetch_row( ){
+        return oci_fetch_row( $this->m_id_statement );
+    }
+
+    public function fetch_assoc( ){
+        return oci_fetch_assoc( $this->m_id_statement );
+    }
+
+    public function close( ) {
+
+	// nop - no operation
+
+    }  // function close( )
+
+}	// class cOracleResultSmall
+
+
+class cOracleSmall {
+
+    // a basic subset of the oci operations hidden behind a class
+
+    const CONNECTION_TYPE_DEFAULT = 1;
+    const CONNECTION_TYPE_PERSISTENT = 2;
+    const CONNECTION_TYPE_NEW = 3;
+
+    protected $m_charset = 'WE8ISO8859P1';
+
+    protected $m_connection_handle = null;
+
+    protected $m_fetch_mode = OCI_BOTH;
+    protected $m_is_auto_commit = false;
+    protected $m_is_executing = false;
+
+    protected $m_a_statements = array( );
+
+    protected $m_var_max_size = 1000;
+
+    protected $m_last_query = '';
+
+    protected function SetAutoCommit($auto_commit = true){
+
+	// nicht public, da nur im __construct gesetzt werden kann
+
+        $this->m_is_auto_commit = $auto_commit;
+
+    }
+
+    protected function SetFetchMode($fetch_mode = OCI_BOTH){
+
+	// nicht public, da nur im __construct gesetzt werden kann
+
+        $this->m_fetch_mode = $fetch_mode;
+
+    }
+
+
+   public function GetError(){
+        return @oci_error($this->m_connection_handle);
+    }
+
+   protected function SetNlsLang($charset = 'WE8ISO8859P1' ){
+
+	// nicht public, da nur im __construct gesetzt werden kann
+
+        $this->m_charset = $charset;
+    }
+
+    public function GetExecuteStatus(){
+        return $this->m_is_executing;
+    }
+
+    private function GetBindingType( $var ){
+
+        if (is_a($var, "OCI-Collection")) {
+
+          $binding_type = SQLT_NTY;
+          $this->m_var_max_size = -1;
+
+        } elseif (is_a($var, "OCI-Lob")) {
+
+          $binding_type = SQLT_CLOB;
+          $this->m_var_max_size = -1;
+
+        } else {
+
+          $binding_type = SQLT_CHR;
+
+        }
+
+        return $binding_type;
+    }
+
+    private function Execute( $sql, & $bind = false ){
+
+
+	assert( is_resource( $this->m_connection_handle ) );
+
+        if ( ! is_resource( $this->m_connection_handle ) ) {
+	    return false;
+	}
+
+        $this->m_last_query = $sql;
+
+        $id_statement = @oci_parse( $this->m_connection_handle, $sql );
+
+	if (! $id_statement ) {
+	  $oerr = OCIError($stmt);
+	  echo "Fetch Code 1:".$oerr["message"];
+	  exit;
+	}
+
+        $this->m_statements[ ( int ) $id_statement][ 'text' ] = $sql;
+        $this->m_statements[ ( int) $id_statement ][ 'bind' ] = $bind;
+
+        if ( $bind && is_array( $bind ) ) {
+
+            foreach($bind as $k=>$v){
+
+                oci_bind_by_name($id_statement, $k, $bind[$k], $this->m_var_max_size, $this->GetBindingType( $bind[ $k ] ) );
+
+            }
+        }
+
+        $mode_autocommit = $this->m_is_auto_commit ? OCI_COMMIT_ON_SUCCESS : OCI_DEFAULT;
+
+        $this->m_is_executing = oci_execute( $id_statement, $mode_autocommit );
+
+        return $this->m_is_executing ? $id_statement : false;
+    }
+
+
+    protected function Connect( $connection_string = 'localhost', $user='', $password='', $mode = OCI_DEFAULT, $type = self::CONNECTION_TYPE_DEFAULT ){
+
+    echo "\n before Connect() mit connect = '{$connection_string}'";
+
+      switch ($type) {
+          case self::CONNECTION_TYPE_PERSISTENT: {
+              $this->m_connection_handle = oci_pconnect($user, $password, $connection_string, $this->m_charset, $mode);
+          }; break;
+          case self::CONNECTION_TYPE_NEW: {
+              $this->m_connection_handle = oci_new_connect($user, $password, $connection_string, $this->m_charset, $mode);
+          }; break;
+          default:
+              $this->m_connection_handle = oci_connect($user, $password, $connection_string, $this->m_charset, $mode);
+      }
+
+
+    if ( $this->m_connection_handle === false ) {
+	$e = oci_error();
+	var_dump( $e );
+	die( "\n error connecting to '{$connection_string}' with user '{$user}'" );
+    }
+
+
+      // var_dump( $this->m_connection_handle );
+
+
+
+      return is_resource($this->m_connection_handle) ;
+    }
+
+    public function query( $sql, $bind = false ){
+
+	// returns statement id or false
+
+        $id_statement = $this->Execute( $sql, $bind );		// id_statement or false
+        return  ( is_resource( $id_statement ) ?  new cOracleResultSmall( $id_statement, $this->m_fetch_mode ) : false );
+
+    }
+
+    public function close( ) {
+	if (is_resource($this->m_connection_handle)) {
+	    @oci_close($this->m_connection_handle);
+	  }
+    }
+
+    public function __construct(
+			  $host = 'localhost',
+			  $user = '',
+			  $password = '',
+			  $database = 'localhost',
+			  $mode = OCI_DEFAULT,
+			  $type = self::CONNECTION_TYPE_DEFAULT,
+			  $charset = 'WE8ISO8859P1' ) {
+
+	// in $this->m_connection_handle ist der Handle des Datenbank-Connects gespeichert
+
+        $this->SetNlsLang( $charset );	// defaults to western Europe
+        $this->SetAutoCommit( false );
+        $this->SetFetchMode( OCI_ASSOC );
+
+        $this->Connect( $host, $user, $password, $mode , $type );
+
+    }
+
+    function __destruct( ) {
+
+	$this->close( );
+
+    }	// function __destruct( )
+
+}  // class cOracleSmall
+
 class cCredentialsReader {
 
     //
@@ -204,38 +436,43 @@ class cCredentialsReader {
 
  class cColorsCLI {
 
-	// a good idea of agarzon - https://gist.github.com/agarzon
+	// a good idea of agarzon - https://gist.github.com/agarzon - completely rewritten
 
-	private $fg_colors = array();
-	private $bg_colors = array();
+	private $m_a_fg_colors = array(
+
+	    array( 'black' =>  '0;30'),
+	    array( 'dark_gray' =>  '1;30'),
+	    array( 'blue' =>  '0;34'),
+	    array( 'light_blue' =>  '1;34'),
+	    array( 'green' =>  '0;32'),
+	    array( 'light_green' =>  '1;32'),
+	    array( 'cyan' =>  '0;36'),
+	    array( 'light_cyan' =>  '1;36'),
+	    array( 'red' =>  '0;31'),
+	    array( 'light_red' =>  '1;31'),
+	    array( 'purple' =>  '0;35'),
+	    array( 'light_purple' =>  '1;35'),
+	    array( 'brown' =>  '0;33'),
+	    array( 'yellow' =>  '1;33'),
+	    array( 'light_gray' =>  '0;37'),
+	    array( 'white' =>  '1;37')
+
+	);
+
+
+	private $m_a_bg_colors = array(
+
+	    array( 'black' => '40' ),
+	    array( 'red' => '41' ),
+	    array( 'green' => '42' ),
+	    array( 'yellow' => '43' ),
+	    array( 'blue' => '44' ),
+	    array( 'magenta' => '45' ),
+	    array( 'cyan' => '46' ),
+	    array( 'light_gray' => '47' )
+	);
 
 	function __construct() {
-
-	    $this->fg_colors['black'] = '0;30';
-	    $this->fg_colors['dark_gray'] = '1;30';
-	    $this->fg_colors['blue'] = '0;34';
-	    $this->fg_colors['light_blue'] = '1;34';
-	    $this->fg_colors['green'] = '0;32';
-	    $this->fg_colors['light_green'] = '1;32';
-	    $this->fg_colors['cyan'] = '0;36';
-	    $this->fg_colors['light_cyan'] = '1;36';
-	    $this->fg_colors['red'] = '0;31';
-	    $this->fg_colors['light_red'] = '1;31';
-	    $this->fg_colors['purple'] = '0;35';
-	    $this->fg_colors['light_purple'] = '1;35';
-	    $this->fg_colors['brown'] = '0;33';
-	    $this->fg_colors['yellow'] = '1;33';
-	    $this->fg_colors['light_gray'] = '0;37';
-	    $this->fg_colors['white'] = '1;37';
-
-	    $this->bg_colors['black'] = '40';
-	    $this->bg_colors['red'] = '41';
-	    $this->bg_colors['green'] = '42';
-	    $this->bg_colors['yellow'] = '43';
-	    $this->bg_colors['blue'] = '44';
-	    $this->bg_colors['magenta'] = '45';
-	    $this->bg_colors['cyan'] = '46';
-	    $this->bg_colors['light_gray'] = '47';
 
 	}	// function __construct( )
 
@@ -251,12 +488,12 @@ class cCredentialsReader {
 		$suffix = "\033[0m";
 
 
-		if ( isset( $this->fg_colors[ $fg_color ] ) ) {
-		    $str_colored .= $praefix . $this->fg_colors[ $fg_color ] . "m";
+		if ( isset( $this->m_a_fg_colors[ $fg_color ] ) ) {
+		    $str_colored .= $praefix . $this->m_a_fg_colors[ $fg_color ] . "m";
 		}
 
-		if ( isset( $this->bg_colors[ $bg_color ] ) ) {
-		    $str_colored .= $praefix . $this->bg_colors[ $bg_color ] . "m";
+		if ( isset( $this->m_a_bg_colors[ $bg_color ] ) ) {
+		    $str_colored .= $praefix . $this->m_a_bg_colors[ $bg_color ] . "m";
 		}
 
 		$str_colored .=  $str_output . $suffix;
@@ -450,15 +687,18 @@ class cCommandDatabaseParams {
     protected $m_schema_name = '';
     protected $m_user_name = '';
     protected $m_user_password = '';
+    protected $m_database_provider = '';
 
-    function __construct( $str_params ) {
+    function __construct( $str_params, $database_provider ) {
 
 	// die Parameter als Zeichenkette ohne Delimiter!
 	// die Einträge sind kommasepariert
 
 	// HOST, SCHEMA, USER, PASSWORD
 
+
 	assert( is_string( $str_params ) && ( strlen( trim( $str_params ) ) ) );
+	assert( is_string( $database_provider ) && ( strlen( trim( $database_provider ) ) ) );
 
 	$str_params = trim( $str_params );
 
@@ -468,6 +708,8 @@ class cCommandDatabaseParams {
 	$this->m_schema_name = $a_params[ 1 ];
 	$this->m_user_name = $a_params[ 2 ];
 	$this->m_user_password = $a_params[ 3 ];
+
+	$this->m_database_provider = strtoupper( trim( $database_provider ) );
 
 	assert( strlen( trim( $this->m_host_name ) ) );
 	assert( strlen( trim( $this->m_schema_name ) ) );
@@ -485,18 +727,40 @@ class cCommandDatabaseParams {
 
 	$mysqli = null;
 
+
 	do {
 
 	    $obj_credentials = new cCredentialsReader( $host_name, $schema_name, $user_name, $user_password );
 
 	    echo "\n trying to connect to the database server";
 
-	    $mysqli = new mysqli(
-		$obj_credentials->m_host_name,
-		$obj_credentials->m_user_name,
-		$obj_credentials->m_user_password,
-		$obj_credentials->m_schema_name
-	    );
+	    if ( $this->m_database_provider == 'MYSQLI' ) {
+
+		echo "\n connecting to MYSQL";
+
+		$mysqli = new mysqli(
+		    $obj_credentials->m_host_name,
+		    $obj_credentials->m_user_name,
+		    $obj_credentials->m_user_password,
+		    $obj_credentials->m_schema_name
+		);
+
+	    } elseif ( $this->m_database_provider == 'ORACLE' ) {
+
+		echo "\n connecting to ORACLE";
+
+		$mysqli = new cOracleSmall(
+		    $obj_credentials->m_host_name,
+		    $obj_credentials->m_user_name,
+		    $obj_credentials->m_user_password,
+		    $obj_credentials->m_schema_name
+		);
+
+	    } else {
+
+		die( "\n unknown database provider '{$this->m_database_provider}'" );
+
+	    }
 
 	    echo " .. finished";
 
@@ -534,6 +798,8 @@ class cCommandDatabaseParams {
 
     public function GetOpenedDatabase( ) {
 
+	echo "\n preparing to open the database";
+
 	$mysqli = $this->ReadCredentials( );
 
         if ( $mysqli === false ) {
@@ -541,6 +807,8 @@ class cCommandDatabaseParams {
 	    die( "\n could not open the database '{$this->m_schema_name}' - check the credentials!" );
 
         }
+
+        echo "\n established database connection";
 
         assert( is_a( $mysqli, 'mysqli' ) );
 
@@ -555,18 +823,22 @@ class cCommandIncrement {
 
     public $m_field_name = '';
     public $m_a_increment_vars = array( );
+    public $m_database_provider = 'MYSQL';
 
-    function __construct( $field_name, $a_increment_vars ) {	// cCommandIncrement
+    function __construct( $field_name, $a_increment_vars, $database_provider ) {	// cCommandIncrement
 
 	assert( is_string( $field_name ) );
 	assert( is_array( $a_increment_vars ) );
 
 	$this->m_field_name = $field_name;
 	$this->m_a_increment_vars = $a_increment_vars;
+	$this->m_database_provider = $database_provider;
 
     }	// function __construct( )
 
     public function GetInsertParts( & $str_field_name, & $str_value, & $a_variables, $table_name ) {
+
+	// Teile eines Inserts zusammentragen
 
 	$str_field_name = $this->m_field_name;
 
@@ -581,7 +853,7 @@ class cCommandIncrement {
 	$was_here = false;
 	foreach ( $this->m_a_increment_vars as $var ) {
 
-	    if ( ! isset( $a_variables[ $var ] ) ) die( "\n program crashed: cannot find predefined variable '$var' in INCREMENT" );
+	    if ( ! isset( $a_variables[ $var ] ) ) die( "\n program crashed: cannot find predefined variable '$var' from INCREMENT" );
 
 	    if ( $was_here ) {
 		$where .= ' AND ';
@@ -593,7 +865,12 @@ class cCommandIncrement {
 
 	}
 
-	$str_value = "( SELECT IF( ISNULL( MAX( {$str_field_name} ) ), 1, MAX( {$str_field_name} ) + 1 ) FROM {$table_name} AS _XXX_ {$where} )";
+	if ( $this->m_database_provider == 'ORACLE' ) {
+	    // $str_value = "( SELECT CASE WHEN ISNULL( MAX( {$str_field_name} ) ) THEN 1 ELSE MAX( {$str_field_name} ) + 1 ) FROM {$table_name} XXX {$where} )";
+	    $str_value = "( SELECT NVL( MAX( {$str_field_name} ), 0 ) + 1 FROM {$table_name} XXX {$where} )";
+	} else {
+	    $str_value = "( SELECT IF( ISNULL( MAX( {$str_field_name} ) ), 1, MAX( {$str_field_name} ) + 1 ) FROM {$table_name} AS _XXX_ {$where} )";
+	}
 
     }	// function GetInsertParts( )
 
@@ -653,16 +930,18 @@ class cCommandFetch {
 
     private function FetchData( ) {
 
+	assert( $this->m_mysqli !== false );
+
 	$result = $this->m_mysqli->query( $this->m_sql );
 
 	if ( $result === false ) {
 
-	    printf("<br>FetchData: \n Errormessage: %s \n SQL: %s", $this->m_mysqli->error, $this->m_sql );
-	    die( "\n Abbruch wegen Datanbankfehler" );
+	    printf("\nFetchData: \n Errormessage: %s \n SQL: %s", $this->m_mysqli->error, $this->m_sql );
+	    die( "\n Abbruch wegen Datenbankfehler" );
 
 	} else {
 
-	    while ( $row = $result->fetch_row( ) ) {
+ 	   while ( $row = $result->fetch_row( ) ) {
 
 		$this->m_a_field_values[] = $row;;
 
@@ -674,6 +953,8 @@ class cCommandFetch {
     }	// function FetchData( )
 
     public function ReplaceFieldVars( & $sql ) {
+
+	// Feldvariablen ( Feldnamen mit vorangestelltem Doppelpunkt ) austauschen gegen Werte
 
 	$a_field_names = array( );
 	$a_field_values = array( );
@@ -690,6 +971,8 @@ class cCommandFetch {
 
     public function GetRandomizedFetchData( & $field_names, & $values ) {
 
+// 	if ( ! count( $this->m_a_field_values ) ) return;
+
 	$index = rand( 0 , count( $this->m_a_field_values ) - 1  );
 
 	$field_names = $this->m_a_field_names;
@@ -702,9 +985,13 @@ class cCommandFetch {
 
 	$values = $this->m_a_field_values[ $index ];
 
+
+
+// array_walk(debug_backtrace(),create_function('$a,$b','print "{$a[\'function\']}()(".basename($a[\'file\']).":{$a[\'line\']}); ";'));
+
 	if ( count( $values ) < count( $field_names )  ) {
 
-	    die( "\n program crashed: too less fields in sql \n {$this->m_sql}" );
+	    die( "\n program crashed: sql returns no rows! \n {$this->m_sql}" );
 
 	}
 
@@ -713,12 +1000,15 @@ class cCommandFetch {
 
     public function GetInsertParts( & $str_field_names, & $str_values, & $a_variables ) {
 
+	// Teile eines Inserts zusammentragen
+
 	$str_field_names = '';
 	$str_values = '';
 
 	$was_active = false;
 
 	$this->GetRandomizedFetchData( $a_field_names, $a_values );
+
 
 	for ( $i = 0; $i < count( $a_field_names ); $i++ ) {
 
@@ -839,12 +1129,18 @@ class cCommand {
 
     protected $m_a_fetched = array( );		// FETCH-Ergebnisse mit Objekten vom Typ cCommandFetch
 
+    protected $m_user_defined_code = '';	// vom Benutzer initiierter Code - delete from und insert
+
+/*
     // the database credentials
 
     protected $m_host_name = '';
     protected $m_schema_name = '';
     protected $m_user_name = '';
     protected $m_user_password = '';
+*/
+
+    protected $m_database_provider = 'MYSQL';	// the database provider - MYSQL or ORACLE
 
     protected function ResetData( ) {
 
@@ -944,7 +1240,17 @@ class cCommand {
 
 	$last = $this->m_act_record_number + $this->m_records_to_export;
 
-	$begin = 'BEGIN;' . chr(10);
+
+	if ( $this->m_database_provider == 'ORACLE' ) {
+	    $this->m_sql_code .= chr( 10 ) . 'SET DEFINE OFF;' . chr( 10 );
+	    $this->m_sql_code .= chr( 10 ) . " ALTER SESSION SET NLS_DATE_FORMAT = 'YYYY-MM-DD HH24:MI:SS'; " . chr( 10 );
+	}
+	$this->m_sql_code .= chr( 10 ) . 'START TRANSACTION;' . chr( 10 );
+
+	$this->m_sql_code .= $this->m_user_defined_code;
+	$this->m_user_defined_code = '';
+
+// 	$begin .= 'BEGIN;' . chr(10);
 	$commit = 'COMMIT;' . chr(10);
 	$prefix = chr(10) . 'INSERT INTO ' . $this->m_act_table . '(';
 	$middle = ' ) VALUES ( ';
@@ -1012,7 +1318,7 @@ class cCommand {
 					$this->m_a_changes[ $j ][ 5 ]  )
 					;
 
-		    $values .= chr( 34 ) . $value . chr( 34 );
+		    $values .= "'" . $value . "'";
 
 
 		    $this->m_a_variables[ $this->m_a_changes[ $j ][ 1 ] ]  = $value;
@@ -1022,12 +1328,12 @@ class cCommand {
 
 		    $fields .= $this->m_a_changes[ $j ][ 1 ];
 /*
-		    $values .= chr( 34 ) . $this->Randomize(
+		    $values .= "'" . $this->Randomize(
 						$this->m_a_changes[ $j ][ 2 ],
 						$this->m_a_changes[ $j ][ 3 ],
 						$this->m_a_changes[ $j ][ 4 ],
 						$this->m_a_changes[ $j ][ 5 ] )
-						. chr( 34 );
+						. "'";
 */
 		    $values =  $this->m_a_changes[ $j ][ 3 ] ;
 
@@ -1037,7 +1343,7 @@ class cCommand {
 		} elseif ( $this->m_a_changes[ $j ][ 0 ] == self::__IMPORT_CHANGE_SET__ ) {
 
 		    $fields .= $this->m_a_changes[ $j ][ 1 ];
-		    $values .= chr( 34 ) . $this->m_a_changes[ $j ][ 2 ] . chr( 34 );
+		    $values .= "'" . $this->m_a_changes[ $j ][ 2 ] . "'";
 
 		    $this->m_a_variables[ $this->m_a_changes[ $j ][ 1 ] ]  = $this->m_a_changes[ $j ][ 2 ] ;
 
@@ -1048,32 +1354,32 @@ class cCommand {
 
 		    if ( $this->m_a_changes[ $j ][ 2 ] == 'ZIPCODE' ) {
 
- 			$values .= chr( 34 ) . $zip_code . chr( 34 );
+ 			$values .= "'" . $zip_code . "'";
  			$this->m_a_variables[ $this->m_a_changes[ $j ][ 1 ] ]  = $zip_code ;
 
 		    } elseif ( $this->m_a_changes[ $j ][ 2 ] == 'SURNAME' ) {
 
- 			$values .= chr( 34 ) . $surname . chr( 34 );
+ 			$values .= "'" . $surname . "'";
  			$this->m_a_variables[ $this->m_a_changes[ $j ][ 1 ] ]  = $surname ;
 
 		    } elseif ( $this->m_a_changes[ $j ][ 2 ] == 'PRENAME' ) {
 
- 			$values .= chr( 34 ) . $prename . chr( 34 );
+ 			$values .= "'" . $prename . "'";
  			$this->m_a_variables[ $this->m_a_changes[ $j ][ 1 ] ]  = $prename ;
 
 		    } elseif ( $this->m_a_changes[ $j ][ 2 ] == 'STREET' ) {
 
- 			$values .= chr( 34 ) . $street . chr( 34 );
+ 			$values .= "'" . $street . "'";
  			$this->m_a_variables[ $this->m_a_changes[ $j ][ 1 ] ]  = $street ;
 
 		    } elseif ( $this->m_a_changes[ $j ][ 2 ] == 'CITY' ) {
 
- 			$values .= chr( 34 ) . $city . chr( 34 );
+ 			$values .= "'" . $city . "'";
  			$this->m_a_variables[ $this->m_a_changes[ $j ][ 1 ] ]  = $city ;
 
 		    } elseif ( $this->m_a_changes[ $j ][ 2 ] == 'UNIQUE' ) {
 
- 			$values .= chr( 34 ) . $i . chr( 34 );
+ 			$values .= "'" . $i . "'";
  			$this->m_a_variables[ $this->m_a_changes[ $j ][ 1 ] ]  = $i ;
 
 		    }
@@ -1144,7 +1450,7 @@ class cCommand {
 	    die( "\n program crashed: could not open file '{$this->m_act_filename_export}'" );
 	}
 
-	fwrite( $this->m_filehandle_export, "/* Randomized sql data for mysql database generated with mk-test-data.php ( Rainer Stötter 2016 )*/\n\nBEGIN;\n\n" );
+	fwrite( $this->m_filehandle_export, "/* Randomized sql data for mysql database generated with mk-test-data.php ( Rainer Stötter 2016,2017 )*/\n\n\n\n" );
 
     }	// function OpenExportFile( )
 
@@ -1502,6 +1808,11 @@ class cCommand {
 	// Generate random number using above bounds
 	$val = rand( $min, $max );
 
+/*
+	if ( $this->m_database_provider == 'ORACLE' ) {
+	    return date( 'Y-m-d H:i:s', $val );
+	}
+*/
 	// Convert back to desired date format
 	return date('Y-m-d', $val);
 
@@ -1857,7 +2168,42 @@ class cCommand {
 
 	$token_next = strtoupper( $this->NextToken( ) );
 
-	if ( $token_next == 'DO' ) {
+	if ( $token_next == 'DATABASE' ) {
+
+	    $this->SkipSpaces( );
+	    $token = $this->ScanToken( );
+
+	    $this->SkipSpaces( );
+	    $token = strtoupper( $this->ScanToken( ) );
+
+	    if ( $token != 'PROVIDER' ) {
+		die ( "\n Program crashed: DATABASE without PROVIDER detected" );
+	    }
+
+	    $this->SkipSpaces( );
+	    $token = strtoupper( $this->ScanToken( ) );
+
+	    if ( $token != 'IS' ) {
+		die ( "\n Program crashed: DATABASE PROVIDER without IS detected" );
+	    }
+
+	    $this->SkipSpaces( );
+
+	    if ( $this->FollowsDelimiter( ) ) {
+		$this->GetTextBetweenDelimiters( $token );
+	    } else {
+		$token = $this->ScanToken( ) ;
+	    }
+
+	    $this->m_database_provider = strtoupper( trim( $token ) );
+	    if ( $this->m_database_provider == '' ) $this->m_database_provider = 'MYSQL';
+
+	    echo "\n". $this->m_obj_colors->ColoredCLI( 'DATABASE PROVIDER IS ' . $this->m_database_provider,  'dark_gray' ) ;
+
+	    // assert there follows a semicolon
+	    $this->AssertFollowingSemicolon( );
+
+	} elseif ( $token_next == 'DO' ) {
 
 	    $this->SkipSpaces( );
 	    $token = $this->ScanToken( );
@@ -1893,9 +2239,9 @@ class cCommand {
 	    }
 
 	    if ( $where == '' ) {
-		$this->m_sql_code .= "\n DELETE FROM $table_name;";
+		$this->m_user_defined_code .= "\n DELETE FROM $table_name;";
 	    } else {
-		$this->m_sql_code .= "\n DELETE FROM $table_name where " . $where . ';';
+		$this->m_user_defined_code .= "\n DELETE FROM $table_name where " . $where . ';';
 	    }
 
 	    echo "\n". $this->m_obj_colors->ColoredCLI( 'DELETING records with where = ' . $where,  'dark_gray' ) ;
@@ -1953,7 +2299,7 @@ class cCommand {
 
 	    }
 
-	    $obj_command_increment = new cCommandIncrement( $field_name, $a_increment_vars );
+	    $obj_command_increment = new cCommandIncrement( $field_name, $a_increment_vars, $this->m_database_provider );
 
 	    $this->m_a_incremented[] = $obj_command_increment;
 
@@ -2048,7 +2394,8 @@ class cCommand {
 
 	    // ask the user for missing credentials
 
-	    $obj_command_database_params = new cCommandDatabaseParams( $params );
+	    echo "\n trying to connect to '{$this->m_database_provider}'";
+	    $obj_command_database_params = new cCommandDatabaseParams( $params, $this->m_database_provider );
 	    $this->m_mysqli = $obj_command_database_params->GetOpenedDatabase( );
 
 	    // assert there follows a semicolon
@@ -2259,7 +2606,7 @@ class cCommand {
 		echo ( "\n Warning: INCLUDE with empty string " );
 	    }
 
-	    $this->m_sql_code .= $token;
+	    $this->m_user_defined_code .= $token;
 
 	    echo "\n". $this->m_obj_colors->ColoredCLI( 'included string constant', 'dark_gray' ) ;
 
@@ -2567,11 +2914,11 @@ Array
 		die ( "\n Program crashed: RUN without EXPORT" );
 	    }
 
-	    echo "\n". $this->m_obj_colors->ColoredCLI( "running the export to file '$this->m_act_filename_export'",  'dark_gray' ) ;
-	    $this->DoTheExport( );
-
 	    // assert there follows a semicolon
 	    $this->AssertFollowingSemicolon( );
+
+	    echo "\n". $this->m_obj_colors->ColoredCLI( "running the export to file '$this->m_act_filename_export'",  'dark_gray' ) ;
+	    $this->DoTheExport( );
 
 
 	} elseif ( $token_next == 'FILENAME' ) {
