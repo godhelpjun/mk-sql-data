@@ -44,6 +44,7 @@ exit;
 sqlplus64 /nolog
 
 connect db2phpsite/db2phpsite@192.168.1.65;
+
 @ 'output/random-fk.sql';
 ```
 
