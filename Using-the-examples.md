@@ -38,6 +38,21 @@ mysql -u db2phpsite -pdb2phpsite < output/random-data.sql
 
 This script file runs against an ORACLE database and creates relational test data. 
 
+## install instantclient from ORACLE and sqlplus
+
+- go to the ORACLE website and search for INSTANTCLIENT
+- download the base package from ORACLE website
+- download the sql plus package from ORACLE website
+- install the packages
+```
+alien --scripts -d oracle-instantclient12.2-basic-12.2.0.1.0-1.x86_64.rpm
+alien --scripts -d oracle-instantclient12.2-sqlplus-12.2.0.1.0-1.x86_64.rpm
+dpkg --install *.deb
+```
+
+## set the ORACLE LIBRARY path
+export DYLD_LIBRARY_PATH=/usr/lib/oracle/12.2/client64/lib
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$DYLD_LIBRARY_PATH
 
 ## install oci8 for php after installing the instant client download from oracle
 
