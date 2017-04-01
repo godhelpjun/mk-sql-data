@@ -22,6 +22,8 @@ mysql -u db2phpsite -pdb2phpsite < mk-sql-data-init-mysql.sql
 
 # Using Oracle
 
+The CONNECT-string may vary depending on the Version and the location of the databse.
+
 ## Install instantclient from ORACLE and sqlplus
 
 - go to the ORACLE website and search for INSTANTCLIENT
@@ -38,7 +40,7 @@ dpkg --install *.deb
 export DYLD_LIBRARY_PATH=/usr/lib/oracle/12.2/client64/lib
 export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$DYLD_LIBRARY_PATH
 
-## Install oci8 for php after installing the instant client download from oracle
+## Install oci8 for php 
 
 the debian way:
 ```
