@@ -37,8 +37,10 @@ dpkg --install *.deb
 ```
 
 ## Set the ORACLE LIBRARY path
+```
 export DYLD_LIBRARY_PATH=/usr/lib/oracle/12.2/client64/lib
 export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$DYLD_LIBRARY_PATH
+```
 
 ## Install oci8 for php 
 
