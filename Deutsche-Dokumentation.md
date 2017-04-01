@@ -10,4 +10,6 @@
 
 [[Das Konfigurationsskript]]
 
+[[Die Beispieldaten benutzen]]
+
 [[Sich am Projekt beteiligen]]
