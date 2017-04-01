@@ -2,7 +2,7 @@ Before you can use the following examples you have to prepare the following [[Pr
 
 # The script file mk-sql-data-01.cmd
 
-This script file runs against a MYSQL database and creates relational test data. 
+This script file runs against a MySQL database and creates relational test data. 
 
 Use the program "mysql" in order to execute the SQL commands.
 
