@@ -1,4 +1,4 @@
-Um die folgenden Beispiele nutzen zu können, sind Vorarbeiten nötig, die hier beschrieben sind [[Vorarbeiten]]
+Um die folgenden Beispiele nutzen zu können, sind Vorarbeiten nötig, die hier beschrieben sind: [[Vorarbeiten]]
 
 # Beispielskript mk-sql-data-01.cmd
 
