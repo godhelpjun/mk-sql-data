@@ -61,6 +61,14 @@ the debian way:
 pecl install oci8-2.0.10
 ```
 
+## tell php to load the oci library
+```
+vi /etc/php5/cli/php.ini
+```
+
+add the line:
+extension=oci8.so
+
 ## create a new user ( = schema )
 
 Use the program "sqlplus" in order to execute the SQL commands. sqlplus64 /nolog starts without connecting to a schema.
