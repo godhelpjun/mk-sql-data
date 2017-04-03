@@ -18,7 +18,7 @@ Sets the date or time column value to a randomized value. Optionally you can dec
 Sets the column value to a randomized value. It can be a phone number, a BIC code, an IBAN code or a former German Bankleitzahl.
 
 ```
-   set <FIELDNAME> TO  RANDOMIZED {FLOAT|INT|BOOL} [BETWEEN <VALUE>  AND <VALUE>];
+   set <FIELDNAME> TO  RANDOMIZED {FLOAT|INT|BOOLEAN} [BETWEEN <VALUE>  AND <VALUE>];
 ```
 Sets the numeric column value to a randomized value. We differ between float, integer and bool values. It is optionally possible to define a range of values with BETWEEN.
 
@@ -50,7 +50,7 @@ See the [[USE .. AS]] command, too.
    set <FIELDNAME> TO <VALUE>;
    set <FIELDNAME> TO  RANDOMIZED {DATE|DATETIME|TIME} [IN {PAST|FUTURE}];
    set <FIELDNAME> TO  RANDOMIZED {PHONE|BLZ|IBAN|BIC};
-   set <FIELDNAME> TO  RANDOMIZED {FLOAT|INT|BOOL} [BETWEEN <VALUE>  AND <VALUE>];
+   set <FIELDNAME> TO  RANDOMIZED {FLOAT|INT|BOOLEAN} [BETWEEN <VALUE>  AND <VALUE>];
    set <FIELDNAME> TO  RANDOMIZED {CHAR} [BETWEEN <VALUE>  AND <VALUE>];
    set <FIELDNAME> TO  SQL "<SQLVALUE>";
 ```
