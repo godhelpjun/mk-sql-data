@@ -12,9 +12,18 @@ In order to use this feature you have to define [[DBPARAMS]] first.
 
 You can define more than one column name in FIELDLIST.
 
+You can use the command without the "DEPENDNG ON" clause, too.  In this case merely the mentioned field will be incremented. It gets the value, which comes next behind the highest value in the table.
+```
+   increment 'ID_BOOKING';
+```
+
+Only scalar field types ( integers ) are supported as field types for the FIELDNAME and the FIELDLIST.
+
+
 ## Syntax:
 
 ```
+   increment <FIELDNAME>;
    increment <FIELDNAME> depending on <FIELDLIST>;
 ```
 
@@ -22,5 +31,7 @@ You can define more than one column name in FIELDLIST.
 
 ```
    increment 'ID_ADDRESS' depending on 'ID_MANDANT, ID_BUCHUNGSKREIS';
+
+   increment 'ID_BOOKING';
 ```
 
