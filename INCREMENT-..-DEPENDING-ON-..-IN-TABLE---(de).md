@@ -11,9 +11,18 @@ Um INCREMENT benutzen zu können, ist zunächst [[DBPARAMS - (de)]] zu definiere
 
 In der Feldliste FIELDLIST kann mehr als ein Spaltenname stehen.
 
+Der Befehl kann auch ohne "DEPENDNG ON" geschrieben werden; dann wird einfach der Wert des benannten Feldes auf den nächsthöheren Wert aus der Datenbank gesetzt.
+
+```
+   increment 'ID_BUCHUNG';
+```
+
+Bisher werden als Feldtypen nur INTEGER-Werte unterstützt.
+
 ## Syntax:
 
 ```
+   increment <FIELDNAME>;
    increment <FIELDNAME> depending on <FIELDLIST>;
 ```
 
@@ -21,5 +30,7 @@ In der Feldliste FIELDLIST kann mehr als ein Spaltenname stehen.
 
 ```
    increment 'ID_ADRESSE' depending on 'ID_MANDANT, ID_BUCHUNGSKREIS';
+
+   increment 'ID_BUCHUNG';
 ```
 
