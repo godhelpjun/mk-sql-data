@@ -17,7 +17,7 @@ Setzt den Wert einer Datums- oder Zeitspalte auf einen randomisierten Wert. Opti
 Setzt den Wert einer Spalte auf einen randomisierten Wert. Dabei wird eine Telefonnummer ( PHONE ), eine IBAN-Kontonummer ( IBAN ), eine Bankleitzahl ( BIC ) oder eine althergebrachte Bankleitzahl (BLZ ) generiert.
 
 ```
-   set <FIELDNAME> TO  RANDOMIZED {FLOAT|INT|BOOL} [BETWEEN <VALUE>  AND <VALUE>];
+   set <FIELDNAME> TO  RANDOMIZED {FLOAT|INT|BOOLEAN} [BETWEEN <VALUE>  AND <VALUE>];
 ```
 Setzt den Wert einer numerischen Spalte auf einen randomisierten Wert. Wir unterscheiden dabei zwischen einer Fließkommazahl ( FLOAT ), einer Ganzzahl ( INTEGER ) und einem Wahrheitswert. Optional kann noch der Bereich für die Zahl angegeben werden mit BETWEEN.. AND.
 
@@ -51,7 +51,7 @@ Setzt den Spaltenwert auf einen SQL-Ausdruck.
    set <FIELDNAME> TO <VALUE>;
    set <FIELDNAME> TO  RANDOMIZED {DATE|DATETIME|TIME} [IN {PAST|FUTURE}];
    set <FIELDNAME> TO  RANDOMIZED {PHONE|BLZ|IBAN|BIC};
-   set <FIELDNAME> TO  RANDOMIZED {FLOAT|INT|BOOL} [BETWEEN <VALUE>  AND <VALUE>];
+   set <FIELDNAME> TO  RANDOMIZED {FLOAT|INT|BOOLEAN} [BETWEEN <VALUE>  AND <VALUE>];
    set <FIELDNAME> TO  RANDOMIZED {CHAR} [BETWEEN <VALUE>  AND <VALUE>];
    set <FIELDNAME> TO  SQL "<SQLVALUE>";
 ```
