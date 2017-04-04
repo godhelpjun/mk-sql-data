@@ -5,7 +5,7 @@
 | ------------- | ------------------ | ----------------- |
 | IBM DB/2      |                    |                   |
 | Informix      |                    |         X         |
-| MySQL         |          X         |                   |
+| MySQL         |          X         |         X         |
 | Oracle        |          X         |         X         |
 | Postgres SQL  |                    |                   |
 
@@ -15,7 +15,7 @@
 | -------------- | ------------------------ | -------------------------|
 | IBM DB/2       |                          |                          |
 | Informix       |                          | [[Install pdo_informix]] |
-| MySQL          |                          |                          |
+| MySQL          |                          | [[Install pdo_mysql]]    |
 | Oracle         | [[Install ORACLE oci8]]  | [[Install pdo_oci]]      |
 | Postgres SQL   |                          |                          |
 
