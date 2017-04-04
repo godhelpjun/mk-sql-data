@@ -10,11 +10,7 @@ pecl install oci8-2.0.10
 ```
 
 ## Tell PHP to load the oci library
-```
-vi /etc/php5/cli/php.ini
-```
 
-add the line:
 ```
-  extension=oci8.so
+echo "extension=oci8.so" > /etc/php5/cli/conf.d/oci8.ini
 ```
