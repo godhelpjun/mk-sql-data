@@ -17,3 +17,13 @@ tar xvf clientsdk.4.10.FC8DE.LINUX.tar
 ./installclientsdk
 ```
 
+## Set your environment variables
+```
+export PATH=$PATH:/opt/IBM/informix/bin/
+export INFORMIXDIR=/opt/IBM/informix
+export INFORMIXSQLHOSTS=/opt/IBM/informix/etc/sqlhosts
+export INFORMIXSERVER=ol_informix1210
+export CLIENT_LOCALE=DE_DE.8859-1 
+# alias dbaccess="rlwrap dbaccess"
+```
+
