@@ -3,7 +3,7 @@ Installing the library dbo_oci with the ORACLE DBO interface is easy on a debian
 ## install ORACLE INSTANTCLIENT
 
 we have to install the base and the development package
-[[install ORACLE INSTANTCLIENT]]
+[[Install ORACLE INSTANTCLIENT]]
 
 do not forget to set ORACLE_HOME
 
