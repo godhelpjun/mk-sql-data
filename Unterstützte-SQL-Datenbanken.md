@@ -15,7 +15,7 @@
 | -------------- | ------------------------ | -------------------------|
 | IBM DB/2       |                          |                          |
 | Informix       |                          | [[Install pdo_informix]] |
-| MySQL          |                          | [[Install pdo_mysql]]    |
+| MySQL          | gehört dazu              | [[Install pdo_mysql]]    |
 | Oracle         | [[Install ORACLE oci8]]  | [[Install pdo_oci]]      |
 | Postgres SQL   |                          |                          |
 
