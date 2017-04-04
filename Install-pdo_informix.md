@@ -1,4 +1,4 @@
-## Install the client software and set the environment
+## install the client software and set the environment
 [[Install Informix Client Software]]
 
 ## make the pdo_informix library
