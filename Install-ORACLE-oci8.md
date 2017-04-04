@@ -1,6 +1,10 @@
 # Install oci8 for PHP 
 
-the debian way:
+## ORACLE INSTANTCLIENT must be installed
+
+[[Install ORACLE INSTANTCLIENT]]
+
+## the debian way:
 ```
 pecl install oci8-2.0.10
 ```
