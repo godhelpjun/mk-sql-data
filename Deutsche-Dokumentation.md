@@ -4,6 +4,8 @@
 
 [[Systemanforderungen]]
 
+[[Unterstützte SQL-Datenbanken]]
+
 [[Schnelleinstieg]]
 
 [[Aufrufparameter von mk-sql-data]]
