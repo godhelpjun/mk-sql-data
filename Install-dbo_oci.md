@@ -23,6 +23,7 @@ as ORACLE INSTANTCLIENT version 12.2 is not supported out of the box, we have to
 vi config.m4
 ```
 change line 150:
+
 9.0|10.1|10.2|11.1|11.2|12.1|12.2)
 
 ## prepare the environment and compile 
