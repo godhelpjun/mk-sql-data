@@ -226,7 +226,7 @@ echo "\n query = '$sql'";
 	// $database = trim( $database );
 
 echo "\n new cPdoSmall with dsn = '$host'";
-echo "\n new cPdoSmall with user = '$user' and pwd = '$password' ";
+
     try {
 	$this->m_pdo = new PDO( $host, $user, $password );
     }
@@ -1143,7 +1143,7 @@ var_dump( $a_params );
 
 	  if ( $this->m_is_dbo_active ) {
 
-		echo "\n ReadCredentials: connecting to PDO";
+		echo "\connecting to PDO";
 
 		$mysqli = new cPdoSmall(
 		    $obj_credentials->m_host_name,
@@ -1799,7 +1799,8 @@ class cCommand {
 
 			}
 
-		    } else {
+		    }
+		    {
 
 			$values .= "'" . $value . "'";
 
@@ -2958,7 +2959,7 @@ class cCommand {
 		$pos_colon = strpos( $params, ':' );
 
 		if ( $pos_colon === false ) {
-		    die ( "\n Program crashed: DBO DSN without database provider" );
+		    die ( "\n Program crashed: DBO DSN without database provider ( '$params' )" );
 		}
 
 		$this->m_database_provider = strtoupper( trim( substr( $params, 0, $pos_colon ) ) );
