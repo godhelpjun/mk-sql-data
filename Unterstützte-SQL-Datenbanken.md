@@ -7,7 +7,7 @@
 | Informix      |                    |         X         |
 | MySQL         |          X         |         X         |
 | Oracle        |          X         |         X         |
-| Postgres SQL  |                    |                   |
+| PostgreSQL    |                    |                   |
 
 ## Installationshilfen
 
@@ -17,5 +17,5 @@
 | Informix       |                          | [[Install pdo_informix]] |
 | MySQL          | gehört dazu              | [[Install pdo_mysql]]    |
 | Oracle         | [[Install ORACLE oci8]]  | [[Install pdo_oci]]      |
-| Postgres SQL   |                          |                          |
+| PostgreSQL     |                          |                          |
 
