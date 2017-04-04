@@ -5,7 +5,7 @@
 | ------------- | ------------------ | ----------------- |
 | IBM DB/2      |                    |                   |
 | Informix      |                    |         X         |
-| MySQL         |          X         |         x         |
+| MySQL         |          X         |         X         |
 | Oracle        |          X         |         X         |
 | PostgreSQL    |                    |                   |
 
