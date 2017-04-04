@@ -1,9 +1,10 @@
+/*
 #
 #	SQL script file for mk-sql-data.php - mysql intefrface
 #
 # creates the tables fk_city and fk_address by a new user db2phpsite
 #
-
+*/
 /*
 
 create a user db2phpsite before you execute these statements!
@@ -28,7 +29,7 @@ create table fk_city IF NOT EXISTS (
   city varchar(255),
   country_id INT(5) NOT NULL,
   is_europe BOOLEAN NOT NULL,
-  last_visit DATE
+  last_visit DATE,
 
     REVNAME                         CHAR(20)     NOT NULL ,
     REVDATE                         DATETIME        NOT NULL ,
@@ -92,8 +93,8 @@ CREATE TABLE IF NOT EXISTS countries (
 insert into countries( country_id, long_name ) values (  83, 'Germany' );
 insert into countries( country_id, long_name ) values (  84, 'Ghana' );
 insert into countries( country_id, long_name ) values (  85, 'Gibraltar' );
+insert into countries( country_id, long_name ) values ( 235, 'Great Britain' );
 insert into countries( country_id, long_name ) values ( 236, 'United States' );
-
 
 
 CREATE TABLE IF NOT EXISTS MANDANT (

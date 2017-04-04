@@ -75,6 +75,395 @@ cTestdatenGenerator:: (4 methods):
   WriteHeader()
 */
 
+class cPdoResultSmall {
+
+    // a basic subset of the PDO methods hidden behind a class
+
+    const RESULT_BOTH = MYSQLI_BOTH;
+    const RESULT_ASSOC = MYSQLI_ASSOC;
+    const RESULT_NUM = MYSQLI_NUM;
+
+
+    protected $m_id_statement = null;
+
+    public $num_rows = -1;
+
+    function __construct( $id_statement ) {
+
+	assert( $id_statement !== false );
+
+	assert( is_a( $id_statement, 'PDOStatement' ) );
+
+	$this->m_id_statement = $id_statement;
+
+	 $this->num_rows = $this->m_id_statement->RowCount( ) ;
+
+    }	// function __destruct( )
+
+    function __destruct( ) {
+
+	$this->close( );
+
+    }	// function __destruct( )
+
+    public function fetch_array( $resulttype = self::RESULT_BOTH ){
+
+	// Fetch a result row as an associative, a numeric array, or both
+
+        if ( $resulttype == self::RESULT_ASSOC ) {
+
+	    return $this->m_id_statement->fetch( PDO::FETCH_ASSOC );
+
+        } elseif ( $resulttype == self::RESULT_NUM ) {
+
+	    return $this->m_id_statement->fetch( PDO::FETCH_NUM );
+
+        }
+
+        // self::RESULT_BOTH
+
+        return $this->m_id_statement->fetch( PDO::FETCH_BOTH );
+
+    }
+
+    public function fetch_row( ){
+
+	// Get a result row as an enumerated array
+
+echo "\n pdo is fetching";
+
+
+	try {
+	    $row = $this->m_id_statement->fetch( PDO::FETCH_NUM );
+var_dump( $row );
+	    return $row;
+	}
+	catch( PDOException $Exception ) {
+	    // PHP Fatal Error. Second Argument Has To Be An Integer, But PDOException::getCode Returns A
+	    // String.
+	    echo "\n error: " .  $Exception->getMessage( );
+	    die( "\n" );
+	}
+
+	return false;
+
+    }
+
+    public function fetch_assoc( $position = self::POSITION_NEXT ){
+
+        return $this->m_id_statement->fetch( PDO::FETCH_ASSOC );
+
+    }
+
+    public function close( ) {
+
+	// nop - no operation
+
+	if ( is_a( $this->m_id_statement, 'PDOStatement' ) ) {
+
+	    $this->m_id_statement->closeCursor( );
+	    $this->m_id_statement = null;
+
+	}
+
+    }  // function close( )
+
+}	// class cPdoResultSmall
+
+class cPdoSmall {
+
+    // a basic subset of the PDO methods
+
+    protected $m_last_query = '';
+
+    protected $m_pdo = null;		// the pdo object
+
+    //
+
+    public function query( $sql  ){
+
+
+	$this->m_last_query = $sql;
+
+echo "\n query = '$sql'";
+
+	try {
+
+	    return new cPdoResultSmall( $this->m_pdo->query( $sql ) );
+	}
+	catch( PDOException $Exception ) {
+	    // PHP Fatal Error. Second Argument Has To Be An Integer, But PDOException::getCode Returns A
+	    // String.
+	    echo "\n error: " .  $Exception->getMessage( );
+	    die( "\n" );
+	}
+
+	return false;
+
+    }
+
+    public function close( ) {
+
+    }
+
+   public function GetError(){
+        return $this->m_pdo->errorCode( );
+    }
+
+   public function GetErrorMessage(){
+        return $this->m_pdo->errorInfo( );
+    }
+
+
+    public function __construct(
+			  $host,
+			  $user,
+			  $password,
+			  $database = ''
+			  ) {
+
+
+	// $database = trim( $database );
+
+echo "\n new cPdoSmall with dsn = '$host'";
+echo "\n new cPdoSmall with user = '$user' and pwd = '$password' ";
+    try {
+	$this->m_pdo = new PDO( $host, $user, $password );
+    }
+    catch( PDOException $Exception ) {
+	// PHP Fatal Error. Second Argument Has To Be An Integer, But PDOException::getCode Returns A
+	// String.
+	echo "\n error: " .  $Exception->getMessage( );
+	die( "\n" );
+    }
+// echo "\n cPdoSmall created";
+    }
+
+    function __destruct( ) {
+
+	$this->close( );
+
+    }	// function __destruct( )
+
+}  // class cPdoSmall
+
+
+
+class cInformixResultSmall {
+
+    // a basic subset of the oci operations hidden behind a class
+
+    const POSITION_NEXT = 'NEXT';
+    const POSITION_PREVIOUS = 'PREVIOUS';
+    const POSITION_CURRENT = 'CURRENT';
+    const POSITION_FIRST = 'FIRST';
+    const POSITION_LAST = 'LAST';
+
+    const RESULT_BOTH = MYSQLI_BOTH;
+    const RESULT_ASSOC = MYSQLI_ASSOC;
+    const RESULT_NUM = MYSQLI_NUM;
+
+    protected $m_id_statement = null;
+
+    public $num_rows = -1;
+
+    function __construct( $id_statement ) {
+
+	assert( $id_statement !== false );
+
+	$this->m_id_statement = $id_statement;
+
+	 $this->num_rows = ifx_num_rows( $this->m_id_statement );
+
+    }	// function __destruct( )
+
+    function __destruct( ) {
+
+	$this->close( );
+
+    }	// function __destruct( )
+
+    public function fetch_array( $resulttype = self::RESULT_BOTH, $position = self::POSITION_NEXT ){
+
+	// Fetch a result row as an associative, a numeric array, or both
+
+        if ( $resulttype == self::RESULT_ASSOC ) {
+
+	    return $this->fetch_assoc( $position );
+
+        } elseif ( $resulttype == self::RESULT_NUM ) {
+
+	    return $this->ifx_fetch_row( $position );
+
+        }
+
+        // self::RESULT_BOTH
+
+        $ary = $this->fetch_assoc( $position );
+
+        $keys = array_keys( $ary );
+        $values = array_values( $ary );
+
+        for( $i = 0; $i < count( $keys ); $i++ ) {
+
+	    $ary[ $keys[ $i ] ] = $values[ $i ];
+
+        }
+
+        return $ary;
+
+    }
+
+    public function fetch_row( $position = self::POSITION_NEXT ){
+
+	// Get a result row as an enumerated array
+
+        return ifx_fetch_row( $this->m_id_statement );
+    }
+
+    public function fetch_assoc( $position = self::POSITION_NEXT ){
+        return ifx_fetch_row( $this->m_id_statement, $position );
+    }
+
+    public function close( ) {
+
+	// nop - no operation
+
+	if ( is_resource( $this->m_id_statement ) ) {
+
+	    // oci_free_statement ( $this->m_id_statement );
+
+	    $this->m_id_statement = null;
+
+	}
+
+    }  // function close( )
+
+}	// class cInformixResultSmall
+
+
+
+class cInformixSmall_UNTESTED {
+
+    // a basic subset of the oci operations hidden behind a class
+
+    // TODO:could not test the configuration because I was not able to install the ifx_XXX functions
+
+    // TODO: cursor_type berücksichtigen!
+
+    protected $m_connection_handle = null;
+
+    protected $m_fetch_mode = cInformixResultSmall::RESULT_BOTH;
+
+    protected $m_last_query = '';
+
+
+    private function Execute( $sql, $cursor_def = IFX_SCROLL, $blob_id_array = null ){
+
+
+	assert( is_resource( $this->m_connection_handle ) );
+
+        if ( ! is_resource( $this->m_connection_handle ) ) {
+	    return false;
+	}
+
+        $this->m_last_query = $sql;
+
+        $id_statement = @ifx_prepare( $sql, $this->m_connection_handle, $cursor_def, $blob_id_array  );
+
+	if (! $id_statement ) {
+	  echo "\n error executing '{$sql}'";
+	  exit;
+	}
+
+        $result = ifx_do( $id_statement );
+
+        return $result;	// false or true, when successful
+    }
+
+
+    protected function Connect( $connection_string = '', $user = '', $password = '', $is_persistent = false ){
+
+	// $conn_id = ifx_connect ("mydb@ol_srv1", "imyself", "mypassword");
+
+	if ( ! $is_persistent ) {
+	    $this->m_connection_handle = ifx_connect( $connection_string, $user, $password );
+	} else {
+	    $this->m_connection_handle = ifx_pconnect( $connection_string, $user, $password );
+	}
+	if ( $this->m_connection_handle === false ) {
+	    die( "\n error connecting to '{$connection_string}' with user '{$user}'" );
+	}
+
+
+      // var_dump( $this->m_connection_handle );
+
+
+
+      return $this->m_connection_handle;	// FALSE oder handle
+    }
+
+    public function query( $sql, $cursor_type = null, $blob_id_array = null  ){
+
+
+        $id_statement = $this->Execute( $sql, $cursor_type, $blob_id_array );
+
+        return  ( $id_statement !== false ?  new cInformixResultSmall( $id_statement ) : false );
+
+    }
+
+    public function close( ) {
+
+	if ( $this->m_connection_handle !== false ) {
+
+	    @ifx_close( $this->m_connection_handle );
+
+	    $this->m_connection_handle = false;
+
+	  }
+
+    }
+
+   public function GetError(){
+        return @ifx_error( );
+    }
+
+   public function GetErrorMessage(){
+        return @ifx_errormsg( $ifx_error( ) );
+    }
+
+
+    public function __construct(
+			  $host = '',
+			  $user = '',
+			  $password = '',
+			  $database = ''
+			  ) {
+
+	// in $this->m_connection_handle ist der Handle des Datenbank-Connects gespeichert
+
+
+	$database = trim( $database );
+
+	if ( strlen( $database ) ) {
+
+	    $host = $database . '@' . $host;
+
+	}
+echo "\n constructing cInformixResultSmall( ) ";
+        $this->Connect( $host, $user, $password );
+
+    }
+
+    function __destruct( ) {
+
+	$this->close( );
+
+    }	// function __destruct( )
+
+}  // class cInformixSmall
+
+
 
 class cOracleResultSmall {
 
@@ -98,6 +487,8 @@ class cOracleResultSmall {
 
     function __destruct( ) {
 
+	$this->close( );
+
     }	// function __destruct( )
 
     public function fetch_array( ){
@@ -115,6 +506,14 @@ class cOracleResultSmall {
     public function close( ) {
 
 	// nop - no operation
+
+	if ( is_resource( $this->m_id_statement ) ) {
+
+	    oci_free_statement ( $this->m_id_statement );
+
+	    $this->m_id_statement = null;
+
+	}
 
     }  // function close( )
 
@@ -237,8 +636,6 @@ class cOracleSmall {
 
     protected function Connect( $connection_string = 'localhost', $user='', $password='', $mode = OCI_DEFAULT, $type = self::CONNECTION_TYPE_DEFAULT ){
 
-    echo "\n before Connect() mit connect = '{$connection_string}'";
-
       switch ($type) {
           case self::CONNECTION_TYPE_PERSISTENT: {
               $this->m_connection_handle = oci_pconnect($user, $password, $connection_string, $this->m_charset, $mode);
@@ -275,9 +672,15 @@ class cOracleSmall {
     }
 
     public function close( ) {
+
 	if (is_resource($this->m_connection_handle)) {
-	    @oci_close($this->m_connection_handle);
+
+	    @oci_close( $this->m_connection_handle );
+
+	    $this->m_connection_handle = null;
+
 	  }
+
     }
 
     public function __construct(
@@ -688,8 +1091,9 @@ class cCommandDatabaseParams {
     protected $m_user_name = '';
     protected $m_user_password = '';
     protected $m_database_provider = '';
+    protected $m_is_dbo_active = false;
 
-    function __construct( $str_params, $database_provider ) {
+    function __construct( $str_params, $database_provider, $is_dbo_active = false ) {
 
 	// die Parameter als Zeichenkette ohne Delimiter!
 	// die Einträge sind kommasepariert
@@ -699,15 +1103,19 @@ class cCommandDatabaseParams {
 
 	assert( is_string( $str_params ) && ( strlen( trim( $str_params ) ) ) );
 	assert( is_string( $database_provider ) && ( strlen( trim( $database_provider ) ) ) );
+	assert( is_bool( $is_dbo_active ) );
 
 	$str_params = trim( $str_params );
 
 	$a_params = explode( ',' , $str_params );
 
+var_dump( $a_params );
+
 	$this->m_host_name = $a_params[ 0 ];
 	$this->m_schema_name = $a_params[ 1 ];
 	$this->m_user_name = $a_params[ 2 ];
 	$this->m_user_password = $a_params[ 3 ];
+	$this->m_is_dbo_active = $is_dbo_active;
 
 	$this->m_database_provider = strtoupper( trim( $database_provider ) );
 
@@ -727,14 +1135,24 @@ class cCommandDatabaseParams {
 
 	$mysqli = null;
 
-
 	do {
 
 	    $obj_credentials = new cCredentialsReader( $host_name, $schema_name, $user_name, $user_password );
 
 	    echo "\n trying to connect to the database server";
 
-	    if ( $this->m_database_provider == 'MYSQLI' ) {
+	  if ( $this->m_is_dbo_active ) {
+
+		echo "\n ReadCredentials: connecting to PDO";
+
+		$mysqli = new cPdoSmall(
+		    $obj_credentials->m_host_name,
+		    $obj_credentials->m_user_name,
+		    $obj_credentials->m_user_password,
+		    $obj_credentials->m_schema_name
+		);
+
+	    } elseif ( $this->m_database_provider == 'MYSQLI' ) {
 
 		echo "\n connecting to MYSQL";
 
@@ -756,7 +1174,18 @@ class cCommandDatabaseParams {
 		    $obj_credentials->m_schema_name
 		);
 
-	    } else {
+	    } elseif ( $this->m_database_provider == 'INFORMIX' ) {
+
+		echo "\n connecting to INFORMIX";
+
+		$mysqli = new cInformixSmall(
+		    $obj_credentials->m_host_name,
+		    $obj_credentials->m_user_name,
+		    $obj_credentials->m_user_password,
+		    $obj_credentials->m_schema_name
+		);
+
+	    }  else {
 
 		die( "\n unknown database provider '{$this->m_database_provider}'" );
 
@@ -827,6 +1256,14 @@ class cCommandIncrement {
 
     function __construct( $field_name, $a_increment_vars, $database_provider ) {	// cCommandIncrement
 
+	/*
+
+	    Der Feldname ist zu inkrementieren
+	    Im Feld $a_increment_vars stehen die Feldnamen, von denen die Inkrementierung abhängt
+	    $a_increment_vars kann auch leer sein, dann wird eben nur der höchste Wert von $field_name ermittelt
+
+	*/
+
 	assert( is_string( $field_name ) );
 	assert( is_array( $a_increment_vars ) );
 
@@ -848,24 +1285,24 @@ class cCommandIncrement {
 
 	    $where .= ' where ';
 
-	}
+	    $was_here = false;
+	    foreach ( $this->m_a_increment_vars as $var ) {
 
-	$was_here = false;
-	foreach ( $this->m_a_increment_vars as $var ) {
+		if ( ! isset( $a_variables[ $var ] ) ) die( "\n program crashed: cannot find predefined variable '$var' from INCREMENT" );
 
-	    if ( ! isset( $a_variables[ $var ] ) ) die( "\n program crashed: cannot find predefined variable '$var' from INCREMENT" );
+		if ( $was_here ) {
+		    $where .= ' AND ';
+		}
 
-	    if ( $was_here ) {
-		$where .= ' AND ';
+		$was_here = true;
+
+		$where .= $var . ' = ' . "'" . $a_variables[ $var ] . "'";
+
 	    }
 
-	    $was_here = true;
-
-	    $where .= $var . ' = ' . "'" . $a_variables[ $var ] . "'";
-
 	}
 
-	if ( $this->m_database_provider == 'ORACLE' ) {
+	if ( $this->m_database_provider == 'ORACLE' || $this->m_database_provider == 'INFORMIX' ) {
 	    // $str_value = "( SELECT CASE WHEN ISNULL( MAX( {$str_field_name} ) ) THEN 1 ELSE MAX( {$str_field_name} ) + 1 ) FROM {$table_name} XXX {$where} )";
 	    $str_value = "( SELECT NVL( MAX( {$str_field_name} ), 0 ) + 1 FROM {$table_name} XXX {$where} )";
 	} else {
@@ -931,9 +1368,9 @@ class cCommandFetch {
     private function FetchData( ) {
 
 	assert( $this->m_mysqli !== false );
-
+echo "\n FetchData gestartet";
 	$result = $this->m_mysqli->query( $this->m_sql );
-
+echo "\n query beendet";
 	if ( $result === false ) {
 
 	    printf("\nFetchData: \n Errormessage: %s \n SQL: %s", $this->m_mysqli->error, $this->m_sql );
@@ -941,6 +1378,8 @@ class cCommandFetch {
 
 	} else {
 
+
+echo "\n fetching rows";
  	   while ( $row = $result->fetch_row( ) ) {
 
 		$this->m_a_field_values[] = $row;;
@@ -948,7 +1387,7 @@ class cCommandFetch {
 	    }
 
 	}
-
+echo "\n FetchData beendet";
 
     }	// function FetchData( )
 
@@ -1131,6 +1570,8 @@ class cCommand {
 
     protected $m_user_defined_code = '';	// vom Benutzer initiierter Code - delete from und insert
 
+    protected $m_is_dbo_active = false;		// true, wenn DBO aktiv ist
+
 /*
     // the database credentials
 
@@ -1176,6 +1617,7 @@ class cCommand {
 
 	if ( ! $this->FollowsDelimiter( ) ) {
 
+	    echo "\n {$this->m_command} ";
 	    die( "\n program crashed: delimiter expected, got '" . $this->ActCh( ) . "'" );
 
 	}
@@ -1234,6 +1676,8 @@ class cCommand {
 	// export the randomized data
 	//
 
+	static $_started_transaction = false;
+
 	$this->m_index_last_export = count( $this->m_a_changes );
 
 	$this->m_a_variables = array( );	// Die Variablenwerte werden ja jedesmal neu berechnet
@@ -1245,13 +1689,32 @@ class cCommand {
 	    $this->m_sql_code .= chr( 10 ) . 'SET DEFINE OFF;' . chr( 10 );
 	    $this->m_sql_code .= chr( 10 ) . " ALTER SESSION SET NLS_DATE_FORMAT = 'YYYY-MM-DD HH24:MI:SS'; " . chr( 10 );
 	}
-	$this->m_sql_code .= chr( 10 ) . 'START TRANSACTION;' . chr( 10 );
+
+
+	if ( ! $_started_transaction ) {
+
+	    if ( $this->m_database_provider == 'INFORMIX' ) {
+		$this->m_sql_code .= chr( 10 ) . 'BEGIN WORK;' . chr( 10 );
+	    } else {
+		$this->m_sql_code .= chr( 10 ) . 'START TRANSACTION;' . chr( 10 );
+	    }
+
+	    $_started_transaction = true;
+
+	}
 
 	$this->m_sql_code .= $this->m_user_defined_code;
 	$this->m_user_defined_code = '';
 
 // 	$begin .= 'BEGIN;' . chr(10);
-	$commit = 'COMMIT;' . chr(10);
+
+	if ( $this->m_database_provider == 'INFORMIX' ) {
+	    $commit = 'COMMIT WORK;' . chr(10);
+	} else {
+	    $commit = 'COMMIT;' . chr(10);
+	}
+
+
 	$prefix = chr(10) . 'INSERT INTO ' . $this->m_act_table . '(';
 	$middle = ' ) VALUES ( ';
 	$suffix =  ');' . chr(10);
@@ -1312,13 +1775,35 @@ class cCommand {
 
 		    $fields .= $this->m_a_changes[ $j ][ 1 ];
 		    $value =  $this->Randomize(
-					$this->m_a_changes[ $j ][ 2 ] ,
+					$this->m_a_changes[ $j ][ 2 ] ,	// data type
 					$this->m_a_changes[ $j ][ 3 ] ,
 					$this->m_a_changes[ $j ][ 4 ] ,
 					$this->m_a_changes[ $j ][ 5 ]  )
 					;
 
-		    $values .= "'" . $value . "'";
+		    if ( $this->m_a_changes[ $j ][ 2 ] == 'DATETIME' ) {
+
+			if ( $this->m_database_provider == 'INFORMIX' ) {
+
+			    // $ret = '( ' . $ret . '.000' . ' )::DATETIME YEAR TO FRACTION ';
+			    $values .= " TO_DATE( '{$value}', '%Y-%m-%d %H:%M:%S' ) ";
+
+			}
+
+		    } elseif ( $this->m_a_changes[ $j ][ 2 ] == 'DATE' ) {
+
+			if ( $this->m_database_provider == 'INFORMIX' ) {
+
+			    // $ret = '( ' . $ret . '.000' . ' )::DATE ';
+			    $values .= " TO_DATE( '{$value}', '%Y-%m-%d' ) ";
+
+			}
+
+		    } else {
+
+			$values .= "'" . $value . "'";
+
+		    }
 
 
 		    $this->m_a_variables[ $this->m_a_changes[ $j ][ 1 ] ]  = $value;
@@ -1424,7 +1909,13 @@ class cCommand {
 
 	if ( is_resource( $this->m_filehandle_export ) ) {
 
-	    fwrite( $this->m_filehandle_export, chr( 10 ) . 'COMMIT;' . chr( 10 ) );
+
+	    if ( $this->m_database_provider == 'INFORMIX' ) {
+		fwrite( $this->m_filehandle_export, chr( 10 ) . 'COMMIT WORK;' . chr( 10 ) );
+	    } else {
+		fwrite( $this->m_filehandle_export, chr( 10 ) . 'COMMIT;' . chr( 10 ) );
+	    }
+
 
 	    fclose( $this->m_filehandle_export );
 
@@ -1791,8 +2282,10 @@ class cCommand {
 	// Generate random number using above bounds
 	$val = rand( $min, $max );
 
+	$ret = date( 'Y-m-d H:i:s', $val );
+
 	// Convert back to desired date format
-	return date( 'Y-m-d H:i:s', $val );
+	return $ret;
 
     }   // function RandomDateTime( )
 
@@ -1813,8 +2306,20 @@ class cCommand {
 	    return date( 'Y-m-d H:i:s', $val );
 	}
 */
+
 	// Convert back to desired date format
-	return date('Y-m-d', $val);
+	$ret = date('Y-m-d', $val);
+
+/*
+	if ( $this->m_database_provider == 'INFORMIX' ) {	// cast string to date
+
+	    // $ret = '( ' . $ret  . ' )::DATE ';
+	    $ret = " TO_DATE( '{$ret}', '%Y-%m-%d' ) ";
+
+	}
+*/
+
+	return $ret;
 
     }   // function RandomDate( )
 
@@ -1870,6 +2375,12 @@ class cCommand {
 	// Find a randomized time between $start_time and $end_time
 
 	$value = rand( 0, 1  ) ;
+
+	if ( $this->m_database_provider == 'INFORMIX' ) {
+
+	    return ( $value == 0 ? 'f' : 't' );
+
+	}
 
 	return $value;
 
@@ -1945,7 +2456,7 @@ class cCommand {
 
     private function RandomText( $min_len = 0, $max_len = 0 )    {
 
-	// Find a randomized time between $start_time and $end_time
+	// Find a randomized text with a length between $min_len and $max_len
 
 /*
 	static $str = '';
@@ -1974,7 +2485,9 @@ class cCommand {
 
 	}
 
-	$ret = substr( $str, 0, strpos( $str, '.', $value ) );;
+	$ret = substr( $str, 0, strpos( $str, '.', $value ) );
+
+	$ret = str_replace( "'", '`', $ret );	// replace delimiters
 
 	if ( $max_len ) return substr( $ret, 0, $max_len );
 
@@ -2168,7 +2681,42 @@ class cCommand {
 
 	$token_next = strtoupper( $this->NextToken( ) );
 
-	if ( $token_next == 'DATABASE' ) {
+	if ( $token_next == 'DBO' ) {
+
+	    $this->SkipSpaces( );
+	    $token = $this->ScanToken( );
+
+	    $this->SkipSpaces( );
+	    $token = strtoupper( $this->ScanToken( ) );
+
+	    if ( $token != 'INTERFACE' ) {
+		die ( "\n Program crashed: DBO without INTERFACE detected" );
+	    }
+
+	    $this->SkipSpaces( );
+	    $token = strtoupper( $this->ScanToken( ) );
+
+	    if ( $token != 'IS' ) {
+		die ( "\n Program crashed: DBO INTERFACE without IS detected" );
+	    }
+
+	    $this->SkipSpaces( );
+	    $token = strtoupper( $this->ScanToken( ) );
+
+	    if ( $token != 'ACTIVE' ) {
+		die ( "\n Program crashed: DBO INTERFACE IS without ACTIVE detected" );
+	    }
+
+	    $this->SkipSpaces( );
+
+	    $this->m_is_dbo_active = true;
+
+	    echo "\n". $this->m_obj_colors->ColoredCLI( 'switching to DBO interface ',  'dark_gray' ) ;
+
+	    // assert there follows a semicolon
+	    $this->AssertFollowingSemicolon( );
+
+	} elseif ( $token_next == 'DATABASE' ) {
 
 	    $this->SkipSpaces( );
 	    $token = $this->ScanToken( );
@@ -2267,37 +2815,48 @@ class cCommand {
 
 		$this->GetTextBetweenDelimiters( $field_name );
 
-		if ( strtoupper ( $this->NextToken( ) ) != 'DEPENDING' ) die( "\n INCREMENT without DEPENDING" );
+		$a_increment_vars = array( );
 
-		// 'DEPENDING' überspringen
+		if ( strtoupper ( $this->NextToken( ) ) == 'DEPENDING' ) {
 
-		$this->ScanToken( );
+		    //if ( strtoupper ( $this->NextToken( ) ) != 'DEPENDING' ) die( "\n INCREMENT without DEPENDING" );
 
-		$this->SkipSpaces( );
+		    // 'DEPENDING' überspringen
 
-		if ( strtoupper ( $this->NextToken( ) ) != 'ON' ) die( "\n INCREMENT DEPENDING without ON" );
+		    $this->ScanToken( );
 
-		// 'DEPENDING' überspringen
+		    $this->SkipSpaces( );
 
-		$this->ScanToken( );
+		    if ( strtoupper ( $this->NextToken( ) ) != 'ON' ) {
+			echo "\n {$this->m_command} ";
+			die( "\n INCREMENT DEPENDING without ON" );
+		    }
 
-		$this->SkipSpaces( );
+		    // 'DEPENDING' überspringen
 
-		// die zweite Feldliste einlesen
+		    $this->ScanToken( );
 
-		$this->GetTextBetweenDelimiters( $str_increment );
+		    $this->SkipSpaces( );
 
-		$a_increment_vars = explode( ',', $str_increment );
+		    // die zweite Feldliste einlesen
 
-		foreach( $a_increment_vars as & $var ) { $var = trim( $var ); }
+		    $this->GetTextBetweenDelimiters( $str_increment );
 
-	    // eventuell noch Feldvariablen ersetzen?
+		    $a_increment_vars = explode( ',', $str_increment );
 
-	    foreach ( $this->m_a_fetched as $fetched ) {
+		    foreach( $a_increment_vars as & $var ) {
+			$var = trim( $var );
+		    }
 
-		$fetched->ReplaceFieldVars( $str_sql );
+		    // eventuell noch Feldvariablen ersetzen?
 
-	    }
+		    foreach ( $this->m_a_fetched as $fetched ) {
+
+			$fetched->ReplaceFieldVars( $str_sql );
+
+		    }
+
+	    }	//es folgte 'DEPENDING'
 
 	    $obj_command_increment = new cCommandIncrement( $field_name, $a_increment_vars, $this->m_database_provider );
 
@@ -2392,10 +2951,32 @@ class cCommand {
 	    // überspringe das Endzeichen
 	    $this->SkipSpaces( );
 
+	    // calculate the database provider, which leads the DNS
+
+	    if ( $this->m_is_dbo_active ) {
+
+		$pos_colon = strpos( $params, ':' );
+
+		if ( $pos_colon === false ) {
+		    die ( "\n Program crashed: DBO DSN without database provider" );
+		}
+
+		$this->m_database_provider = strtoupper( trim( substr( $params, 0, $pos_colon ) ) );
+
+		if ( $this->m_database_provider == 'OCI' ) {
+		    $this->m_database_provider = 'ORACLE';
+		} elseif ( $this->m_database_provider == 'OCI8' ) {
+		    $this->m_database_provider = 'ORACLE';
+		}
+
+		echo "\n". $this->m_obj_colors->ColoredCLI( 'using DBO in order to access ' . $this->m_database_provider,  'dark_gray' ) ;
+
+	    }
+
 	    // ask the user for missing credentials
 
 	    echo "\n trying to connect to '{$this->m_database_provider}'";
-	    $obj_command_database_params = new cCommandDatabaseParams( $params, $this->m_database_provider );
+	    $obj_command_database_params = new cCommandDatabaseParams( $params, $this->m_database_provider, $this->m_is_dbo_active );
 	    $this->m_mysqli = $obj_command_database_params->GetOpenedDatabase( );
 
 	    // assert there follows a semicolon
