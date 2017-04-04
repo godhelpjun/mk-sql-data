@@ -43,7 +43,7 @@ make
 ```
 su
 
-# where are the extensions?
+## where are the extensions?
 php -i |grep "extension_dir"
 
 cp modules/pdo_oci.so /usr/lib/php5/20131226
