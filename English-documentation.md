@@ -4,6 +4,8 @@
 
 [[Requirements]]
 
+[[Supported SQL databases]]
+
 [[Quick start]]
 
 [[The application and it's parameters]]
