@@ -28,24 +28,12 @@ mysql -u db2phpsite -pdb2phpsite < mk-sql-data-init-mysql.sql
 The CONNECT-string may vary depending on the Version and the location of the database.
 
 ## Install INSTANTCLIENT from ORACLE and sqlplus
-[[install ORACLE INSTANTCLIENT]]
+[[Install ORACLE INSTANTCLIENT]]
 
-## Install oci8 for PHP 
+## Install ORACLE oci8 library
 
-the debian way:
-```
-pecl install oci8-2.0.10
-```
+[[Install ORACLE oci8]]
 
-## Tell PHP to load the oci library
-```
-vi /etc/php5/cli/php.ini
-```
-
-add the line:
-```
-  extension=oci8.so
-```
 ## Create a new user ( = schema )
 
 Use the program "sqlplus" in order to execute the SQL commands. sqlplus64 /nolog starts without connecting to a schema.
