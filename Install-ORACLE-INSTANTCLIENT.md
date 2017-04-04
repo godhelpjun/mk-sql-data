@@ -22,6 +22,7 @@ change ~/.bashrc
 ORACLE_HOME=/usr/lib/oracle/12.2/client64/
 export DYLD_LIBRARY_PATH=$ORACLE_HOME/lib
 export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$DYLD_LIBRARY_PATH
+alias sqlplus64="rlwrap sqlplus64"
 ```
 
 
