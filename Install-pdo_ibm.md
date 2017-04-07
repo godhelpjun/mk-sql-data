@@ -33,7 +33,7 @@ php -i |grep "extension_dir"
 cp modules/pdo_ibm.so /usr/lib/php5/20131226
 ```
 
-## tell php cli to use pdo_informix
+## tell php cli to use pdo_ibm
 ```
 echo "extension=pdo_ibm.so" > /etc/php5/cli/conf.d/pdo_ibm.ini
 ```
