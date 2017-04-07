@@ -1,6 +1,7 @@
 ## install the client software and set the environment
-[[Install IBM Client Software]]
+
 ## get the IBM DATA SERVER DRIVER FOR CLI from the IBM webpage
+[[Install IBM DATA SERVER CLIENT Software]]
 
 ## make the pdo_ibm library
 ```
