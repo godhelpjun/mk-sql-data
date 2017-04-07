@@ -1,4 +1,5 @@
 ## First download the IBM Data Server Client from the IBM web page
+## Install the client software
 ```
 cd /tmp
 mkdir db2-client
