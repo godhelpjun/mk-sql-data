@@ -1,37 +1,23 @@
 Before you can use the following examples you have to prepare things described here: [[Prerequisites]]
 
-# The script file mk-sql-data-01.cmd
+[[example mysql]]
 
-This script file runs against a MySQL database and creates relational test data. 
+[[example oracle]]
 
-Use the program "mysql" in order to execute the SQL commands.
 
-## Run the example script and create the test data
-```
-./mk-sql-data.php --cfg mk-sql-data-01.cmd
-```
 
-## Import the test data into our database
-```
-mysql -u db2phpsite -pdb2phpsite < output/random-data.sql
-```
-
-# The script file mk-sql-data-02-ora.cmd
+# The script file mk-sql-data-02-oracle.cmd
 
 This script file runs against an ORACLE database and creates relational test data. You have to change the CONNECT-string in order to fit to your environment
 
 ## Run the example script and create the test data
 ```
-./mk-sql-data.php --cfg mk-sql-data-02-ora.cmd
+./mk-sql-data.php --cfg examples/mk-sql-data-02-oracle.cmd
 ```
 
 ## Import the test data into our database
 ```
-sqlplus64 /nolog
-
-connect db2phpsite/db2phpsite@192.168.1.65;
-
-@ 'output/random-fk.sql';
+sqlplus64 db2phpsite/db2phpsite@192.168.1.65/XE < output/random-fk-oracle.sql
 ```
 
 
