@@ -32,3 +32,22 @@ Use the program "mysql" in order to execute the SQL commands.
 mysql -u db2phpsite -pdb2phpsite db2phpsite< output/random-fk-mysql.sql
 ```
 
+# The script file mk-sql-data-02-pdo-mysql.cmd
+
+This script file runs against an MySQL database with the PDO interface and creates relational test data. 
+
+Use the program "mysql" in order to execute the SQL commands.
+
+## Run the example script and create the test data
+```
+./mk-sql-data.php --cfg examples/mk-sql-data-02-pdo-mysql.cmd
+
+```
+
+## Import the test data into our database 
+
+```
+mysql -u db2phpsite -pdb2phpsite db2phpsite < output/random-fk-mysql-pdo.sql
+```
+
+
