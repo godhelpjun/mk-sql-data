@@ -5,8 +5,8 @@ STARTTIME=$(date +%s)
 
 echo "Erstelle zufällige Testdaten mit mk-sql-data.php"
 
-./mk-sql-data.php --cfg mk_sql_data-00.cmd
-./mk-sql-data.php --cfg mk_sql_data-01.cmd
+./mk-sql-data.php --cfg mk-sql-data-00.cmd
+./mk-sql-data.php --cfg mk-sql-data-01.cmd
 
 ENDTIME=$(date +%s)
 secs=$(($ENDTIME - $STARTTIME))

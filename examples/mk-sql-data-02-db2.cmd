@@ -1,16 +1,11 @@
 #
-#	script file for mk-sql-data.php - informix interface
+#	script file for mk-sql-data.php - ibm db2 pdo interface
 #
-# the tables fk_city and fk_address must exist - do create them with the statements in mk-sql-data-init-informix.sql,
+# the tables fk_city and fk_address must exist - do create them with the statements in mk-sql-data-init-db2.sql,
 # please!
 #
-# as I did not make it to install the ifx_XXX functions we have to use PDO ( PHP database objects ) as interface for
-# the Informix database
+# pdo.so and pdo_ibm.so and IBM data server client package have to be installed before
 #
-# pdo.so and informix_dbo.so and client package have be installed before
-#
-
-
 
 # first we add records to fk_city
 
@@ -18,11 +13,13 @@ reset data;
 reset code;
 reset actions;
 
-PDO interface is active;
+database provider is IBM;
+dbparams = "192.168.1.67,phpsite,db2phpsite,db2phpsite";
 
-dbparams = "informix:host=192.168.1.62;service=9088;database=db2phpsite;server=ol_informix1210;protocol=onsoctcp,db2phpsite,db2phpsite,db2phpsite";
+# PDO interface is active;
+# dbparams = "ibm:database=phpsite;protocol=tcpip;hostname=192.168.1.67;servicename=50000,phpsite,db2phpsite,db2phpsite";
 
-filename is "output/random-fk-informix-pdo.sql";
+filename is "output/random-fk-ibm-db2.sql";
 
 read surnames from "data/de-surnames.txt";
 read prenames from "data/de-prenames.txt";
@@ -43,7 +40,7 @@ work on table fk_city;
 
 start with record 0;
 
-export 150 records;
+export 50 records;
 
 increment 'ID_CITY';
 
@@ -71,7 +68,7 @@ work on table fk_address;
 
 start with record 0;
 
-export 500 records;
+export 50 records;
 
 use Name as surname;
 use Vorname as prename;

@@ -4,7 +4,7 @@
 # the tables fk_city and fk_address must exist - do create them with the statements in mk-sql-data-init-oracle.sql,
 # please!
 #
-# dbo.so and db_oci.so and ORACLE INSTANTCLIENT have be installed before
+# pdo.so and db_oci.so and ORACLE INSTANTCLIENT have be installed before
 #
 # import the data produced with
 # 		sqlplus64 db2phpsite/db2phpsite@192.168.1.65 < output/random-fk.sql
@@ -18,11 +18,11 @@ reset data;
 reset code;
 reset actions;
 
-filename is "output/random-fk.sql";
-
-DBO interface is active;
+PDO interface is active;
 
 dbparams = "oci:dbname=192.168.1.65/XE,db2phpsite,db2phpsite,db2phpsite";
+
+filename is "output/random-fk-oracle-pdo.sql";
 
 read surnames from "data/de-surnames.txt";
 read prenames from "data/de-prenames.txt";

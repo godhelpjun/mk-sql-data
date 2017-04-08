@@ -14,7 +14,7 @@ reset data;
 reset code;
 reset actions;
 
-filename is "output/random-fk.sql";
+filename is "output/random-fk-oracle.sql";
 
 # ask for user name and user password
 dbparams = "192.168.1.65/XE,db2phpsite,db2phpsite,db2phpsite";

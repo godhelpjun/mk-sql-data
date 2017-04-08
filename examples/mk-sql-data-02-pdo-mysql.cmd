@@ -61,7 +61,7 @@
 
 ########################################################################
 
-DBO interface is active;
+PDO interface is active;
 
 dbparams = "mysql:host=localhost;dbname=db2phpsite,db2phpsite,db2phpsite,db2phpsite";
 
@@ -113,7 +113,7 @@ reset data;
 reset code;
 reset actions;
 
-filename is "output/random-fk.sql";
+filename is "output/random-fk-mysql-pdo.sql";
 
 read surnames from "data/de-surnames.txt";
 read prenames from "data/de-prenames.txt";

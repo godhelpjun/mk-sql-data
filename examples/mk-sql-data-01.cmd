@@ -106,7 +106,7 @@ reset data;
 reset code;
 reset actions;
 
-filename is "output/random-fk.sql";
+filename is "output/random-data-mysql.sql";
 
 # ask for user name and user password
 dbparams = "localhost,db2phpsite_test,,";

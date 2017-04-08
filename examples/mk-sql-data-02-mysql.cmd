@@ -63,14 +63,14 @@
 
 include text = "
 
-create table fk_city IF NOT EXISTS (
+CREATE TABLE IF NOT EXISTS fk_city  (
 
   ID_CITY INT UNSIGNED NOT NULL,
 
   city varchar(255),
   country_id INT(5) NOT NULL,
   is_europe BOOLEAN NOT NULL,
-  last_visit DATE
+  last_visit DATE,
 
     REVNAME                         CHAR(20)     NOT NULL ,
     REVDATE                         DATETIME        NOT NULL ,
@@ -106,7 +106,7 @@ reset data;
 reset code;
 reset actions;
 
-filename is "output/random-fk.sql";
+filename is "output/random-fk-mysql.sql";
 
 # ask for user name and user password
 dbparams = "localhost,db2phpsite_test,,";
@@ -156,7 +156,7 @@ work on table fk_address;
 
 start with record 0;
 
-export 500 records;
+export 50 records;
 
 use Name as surname;
 use Vorname as prename;

@@ -5,7 +5,7 @@ error_reporting( E_STRICT );
 
 /*
  *
- *	The app mk-test-data is licensed under the terms of the MIT license
+ *	The app mk-sql-data is licensed under the terms of the MIT license
  *	(c) Rainer Stötter 2016-2017
  */
 
@@ -75,6 +75,315 @@ cTestdatenGenerator:: (4 methods):
   WriteHeader()
 */
 
+class cDB2ResultSmall {
+
+    // a basic subset of the oci operations hidden behind a class
+
+    const RESULT_BOTH = MYSQLI_BOTH;
+    const RESULT_ASSOC = MYSQLI_ASSOC;
+    const RESULT_NUM = MYSQLI_NUM;
+
+    protected $m_id_statement = null;
+
+    public $num_rows = -1;
+
+    function __construct( $id_statement ) {
+
+	assert( $id_statement !== false );
+
+	$this->m_id_statement = $id_statement;
+
+	 $this->num_rows = db2_num_rows( $this->m_id_statement );
+
+    }	// function __destruct( )
+
+    function __destruct( ) {
+
+	$this->close( );
+
+    }	// function __destruct( )
+
+    public function fetch_array( $resulttype = self::RESULT_BOTH ){
+
+	// Fetch a result row as an associative, a numeric array, or both
+
+        if ( $resulttype == self::RESULT_ASSOC ) {
+
+	    return $this->fetch_assoc( );
+
+        } elseif ( $resulttype == self::RESULT_NUM ) {
+
+	    return $this->db2_fetch_row( $this->m_id_statement );
+
+        }
+
+        // self::RESULT_BOTH
+
+        $ary = $this->fetch_assoc( );
+
+        $keys = array_keys( $ary );
+        $values = array_values( $ary );
+
+        for( $i = 0; $i < count( $keys ); $i++ ) {
+
+	    $ary[ $keys[ $i ] ] = $values[ $i ];
+
+        }
+
+        return $ary;
+
+    }
+
+    public function fetch_row( ){
+
+	// Get a result row as an enumerated array
+
+        return db2_fetch_array( $this->m_id_statement );
+    }
+
+    public function fetch_assoc( ){
+
+
+        return db2_fetch_assoc( $this->m_id_statement );
+
+    }
+
+    public function close( ) {
+
+	// nop - no operation
+
+	if ( is_resource( $this->m_id_statement ) ) {
+
+	    db2_free_stmt ( $this->m_id_statement );
+
+	    $this->m_id_statement = null;
+
+	}
+
+    }  // function close( )
+
+}	// class cDB2ResultSmall
+
+
+class cDB2Small {
+
+    // a basic subset of the db2 operations hidden behind a class
+
+    // TODO: cursor_type berücksichtigen!
+
+    protected $m_connection_handle = null;
+
+    protected $m_fetch_mode = cInformixResultSmall::RESULT_BOTH;
+
+    protected $m_last_query = '';
+
+
+    private function Execute( $sql ){
+
+	assert( is_resource( $this->m_connection_handle ) );
+
+        if ( ! is_resource( $this->m_connection_handle ) ) {
+	    return false;
+	}
+
+        $this->m_last_query = $sql;
+
+
+
+         $id_statement = db2_exec( $this->m_connection_handle, $sql, array( 'cursor' => DB2_SCROLLABLE )  );
+/*
+$id_statement = db2_prepare( $this->m_connection_handle, $sql );
+$result = db2_execute( $id_statement );
+*/
+
+	if (! $id_statement ) {
+	  assert( false == true );
+	  debug_print_backtrace( );
+	  echo "\n error executing sql: '{$sql}'";
+	  exit;
+	}
+
+        $result = $id_statement;
+
+        return $result;	// false when not successful
+    }
+
+
+    protected function Connect( $connection_string = '', $user = '', $password = '' ){
+
+	// connection_string ist database!
+
+	$this->m_connection_handle = db2_connect ( $connection_string, $user, $password );
+
+	if ( $this->m_connection_handle === false ) {
+	    die( "\n error connecting to '{$connection_string}' with user '{$user}'" );
+	}
+
+
+      return $this->m_connection_handle;	// FALSE oder handle
+    }
+
+
+    public function DumpClientInfo( ) {
+
+	  $client = db2_client_info( $this->m_connection_handle );
+
+	  if ($client) {
+	      echo "DRIVER_NAME: ";           var_dump( $client->DRIVER_NAME );
+	      echo "DRIVER_VER: ";            var_dump( $client->DRIVER_VER );
+	      echo "DATA_SOURCE_NAME: ";      var_dump( $client->DATA_SOURCE_NAME );
+	      echo "DRIVER_ODBC_VER: ";       var_dump( $client->DRIVER_ODBC_VER );
+	      echo "ODBC_VER: ";              var_dump( $client->ODBC_VER );
+	      echo "ODBC_SQL_CONFORMANCE: ";  var_dump( $client->ODBC_SQL_CONFORMANCE );
+	      echo "APPL_CODEPAGE: ";         var_dump( $client->APPL_CODEPAGE );
+	      echo "CONN_CODEPAGE: ";         var_dump( $client->CONN_CODEPAGE );
+	  }
+	  else {
+	      echo "Error retrieving client information.
+	      Perhaps your database connection was invalid.";
+	  }
+
+
+    }	// function DumpClientInfo( )
+
+    public function query( $sql ){
+
+        $id_statement = $this->Execute( $sql );
+
+        return  ( $id_statement !== false ?  new cDB2ResultSmall( $id_statement ) : false );
+
+    }
+
+    public function close( ) {
+
+	if ( $this->m_connection_handle !== false ) {
+
+	    db2_close( $this->m_connection_handle );
+
+	    $this->m_connection_handle = false;
+
+	  }
+
+    }
+
+   public function GetError(){
+        return @db2_conn_error(  $this->m_connection_handle );
+    }
+
+   public function GetErrorMessage(){
+        return @db2_conn_errormsg(  $this->m_connection_handle );
+    }
+
+
+    public function __construct(
+			  $host = '',
+			  $user = '',
+			  $password = '',
+			  $database = ''
+			  ) {
+
+	// in $this->m_connection_handle ist der Handle des Datenbank-Connects gespeichert
+
+
+	$database = trim( $database );
+/*
+	if ( strlen( $database ) ) {
+
+	    $host = $database . '@' . $host;
+
+	}
+*/
+echo "\n constructing cDB2Small( ) ";
+
+        $this->Connect( $database, $user, $password );
+
+    }
+
+    function __destruct( ) {
+
+	$this->close( );
+
+    }	// function __destruct( )
+
+}  // class cDB2Small
+
+
+class cStringPartitioner {
+
+    protected $m_str_long = '';
+    protected $m_table_name = '';
+    protected $m_field_name = '';
+    protected $m_file_handle = null;
+    protected $m_database_provider = '';
+    protected $m_update_where = '';	// where clause
+
+    function __construct( & $str_long, $table_name, $field_name, $file_handle, $database_provider, $update_where  ) {
+
+	assert( is_string( $str_long ) );
+	assert( is_string( $table_name ) );
+	assert( is_string( $field_name ) );
+	assert( is_resource( $file_handle ) );
+	assert( is_string( $database_provider ) );
+	assert( is_string( $update_where ) );
+
+	$this->m_str_long = @ $str_long;
+	$this->m_table_name = $table_name;
+	$this->m_field_name = $field_name;
+	$this->m_file_handle = $file_handle;
+	$this->m_database_provider = $database_provider;
+	$this->m_update_where = $update_where;
+
+
+    }	// __construct( )
+
+    function __destruct( ) {
+
+	// wir haben einen Pointer! $this->m_str_long = null;
+
+    }
+
+    public function AddUpdates( ) {
+
+	$len = strlen( $this->m_str_long );
+
+//	$max_size = 31 * 1024;	// 31 kb statt 32 kb
+
+	$max_size = 1900;
+
+	$pos = 0;
+
+	$count = ceil( $len / $max_size );
+
+	for ( $i = 0; $i < $count; $i++ ) {
+
+	    $str = substr( $this->m_str_long, $i * $max_size, $max_size );
+
+	    $str = str_replace( ';', '\;', $str );
+
+	    // TODO: was passiert, wenn ein escaped character zerbrochen wird?
+
+	    $kb = round( $max_size / 1024, 2 );
+
+	    fwrite( $this->m_file_handle, "\n -- {$kb} kb, {$max_size} bytes \n" );
+
+	    $sql = "\n\n SET SQLTERMINATOR \\ ";
+	    $sql .= "\n update {$this->m_table_name} set {$this->m_field_name} = CONCAT ( {$this->m_field_name}, '{$str}' ) where {$this->m_update_where}; \n" ;
+	    $sql .= "\\";
+	    $sql .= "\n SET SQLTERMINATOR ON\n\n";
+
+	    fwrite( $this->m_file_handle, $sql );
+
+	    echo '.';
+	}
+
+	echo "\n";
+
+
+    }	// function AddUpdates( )
+
+
+}	// class cStringPartitioner
+
 class cPdoResultSmall {
 
     // a basic subset of the PDO methods hidden behind a class
@@ -130,19 +439,25 @@ class cPdoResultSmall {
 
 	// Get a result row as an enumerated array
 
-echo "\n pdo is fetching";
-
 
 	try {
 	    $row = $this->m_id_statement->fetch( PDO::FETCH_NUM );
-var_dump( $row );
+
 	    return $row;
 	}
 	catch( PDOException $Exception ) {
 	    // PHP Fatal Error. Second Argument Has To Be An Integer, But PDOException::getCode Returns A
 	    // String.
-	    echo "\n error: " .  $Exception->getMessage( );
-	    die( "\n" );
+
+	    echo "\n available drivers:";
+	    foreach( PDO::getAvailableDrivers( ) as $driver)
+		echo $driver, "\n";
+
+	      echo $this->GetError( );
+	      echo "\n PDO error: " .  $Exception->getMessage( );
+	      die( "\n" );
+
+
 	}
 
 	return false;
@@ -185,7 +500,7 @@ class cPdoSmall {
 
 	$this->m_last_query = $sql;
 
-echo "\n query = '$sql'";
+	// echo "\n query = '$sql'";
 
 	try {
 
@@ -194,7 +509,13 @@ echo "\n query = '$sql'";
 	catch( PDOException $Exception ) {
 	    // PHP Fatal Error. Second Argument Has To Be An Integer, But PDOException::getCode Returns A
 	    // String.
-	    echo "\n error: " .  $Exception->getMessage( );
+
+	  echo "\n available drivers:";
+	  foreach( PDO::getAvailableDrivers( ) as $driver)
+	      echo $driver, "\n";
+
+	    echo $this->GetError( );
+	    echo "\n PDO error: " .  $Exception->getMessage( );
 	    die( "\n" );
 	}
 
@@ -233,8 +554,14 @@ echo "\n new cPdoSmall with dsn = '$host'";
     catch( PDOException $Exception ) {
 	// PHP Fatal Error. Second Argument Has To Be An Integer, But PDOException::getCode Returns A
 	// String.
-	echo "\n error: " .  $Exception->getMessage( );
-	die( "\n" );
+	  echo "\n available drivers:";
+	  foreach( PDO::getAvailableDrivers( ) as $driver)
+	      echo $driver, "\n";
+
+	    echo $this->GetError( );
+	    echo "\n PDO error: " .  $Exception->getMessage( );
+	    die( "\n" );
+
     }
 // echo "\n cPdoSmall created";
     }
@@ -1086,12 +1413,12 @@ class cConfigFile {
 
 class cCommandDatabaseParams {
 
-    protected $m_host_name = '';
-    protected $m_schema_name = '';
-    protected $m_user_name = '';
-    protected $m_user_password = '';
-    protected $m_database_provider = '';
-    protected $m_is_dbo_active = false;
+    public $m_host_name = '';
+    public $m_schema_name = '';
+    public $m_user_name = '';
+    public $m_user_password = '';
+    public $m_database_provider = '';
+    public $m_is_dbo_active = false;
 
     function __construct( $str_params, $database_provider, $is_dbo_active = false ) {
 
@@ -1109,7 +1436,7 @@ class cCommandDatabaseParams {
 
 	$a_params = explode( ',' , $str_params );
 
-var_dump( $a_params );
+// var_dump( $a_params );
 
 	$this->m_host_name = $a_params[ 0 ];
 	$this->m_schema_name = $a_params[ 1 ];
@@ -1152,7 +1479,7 @@ var_dump( $a_params );
 		    $obj_credentials->m_schema_name
 		);
 
-	    } elseif ( $this->m_database_provider == 'MYSQLI' ) {
+	    } elseif ( $this->m_database_provider == 'MYSQL' ) {
 
 		echo "\n connecting to MYSQL";
 
@@ -1185,7 +1512,18 @@ var_dump( $a_params );
 		    $obj_credentials->m_schema_name
 		);
 
-	    }  else {
+	    }  elseif ( $this->m_database_provider == 'IBM' ) {
+
+		echo "\n connecting to IBM DB2";
+
+		$mysqli = new cDB2Small(
+		    $obj_credentials->m_host_name,
+		    $obj_credentials->m_user_name,
+		    $obj_credentials->m_user_password,
+		    $obj_credentials->m_schema_name
+		);
+
+	    } else {
 
 		die( "\n unknown database provider '{$this->m_database_provider}'" );
 
@@ -1296,7 +1634,8 @@ class cCommandIncrement {
 
 		$was_here = true;
 
-		$where .= $var . ' = ' . "'" . $a_variables[ $var ] . "'";
+		// $where .= $var . ' = ' . "'" . $a_variables[ $var ] . "'";
+		$where .= $var . ' = ' . $a_variables[ $var ] ;
 
 	    }
 
@@ -1305,6 +1644,8 @@ class cCommandIncrement {
 	if ( $this->m_database_provider == 'ORACLE' || $this->m_database_provider == 'INFORMIX' ) {
 	    // $str_value = "( SELECT CASE WHEN ISNULL( MAX( {$str_field_name} ) ) THEN 1 ELSE MAX( {$str_field_name} ) + 1 ) FROM {$table_name} XXX {$where} )";
 	    $str_value = "( SELECT NVL( MAX( {$str_field_name} ), 0 ) + 1 FROM {$table_name} XXX {$where} )";
+	} elseif ( $this->m_database_provider == 'IBM' ) { // seems to have no alias
+	    $str_value = "( SELECT COALESCE( MAX( {$str_field_name} ), 0 ) + 1 FROM {$table_name} AS X___XXX___ {$where} )";
 	} else {
 	    $str_value = "( SELECT IF( ISNULL( MAX( {$str_field_name} ) ), 1, MAX( {$str_field_name} ) + 1 ) FROM {$table_name} AS _XXX_ {$where} )";
 	}
@@ -1367,10 +1708,12 @@ class cCommandFetch {
 
     private function FetchData( ) {
 
+    // lese alle verfügbaren Werte ein nach $this->m_a_field_values[]
+
 	assert( $this->m_mysqli !== false );
-echo "\n FetchData gestartet";
+
 	$result = $this->m_mysqli->query( $this->m_sql );
-echo "\n query beendet";
+
 	if ( $result === false ) {
 
 	    printf("\nFetchData: \n Errormessage: %s \n SQL: %s", $this->m_mysqli->error, $this->m_sql );
@@ -1379,7 +1722,6 @@ echo "\n query beendet";
 	} else {
 
 
-echo "\n fetching rows";
  	   while ( $row = $result->fetch_row( ) ) {
 
 		$this->m_a_field_values[] = $row;;
@@ -1387,7 +1729,7 @@ echo "\n fetching rows";
 	    }
 
 	}
-echo "\n FetchData beendet";
+
 
     }	// function FetchData( )
 
@@ -1425,7 +1767,6 @@ echo "\n FetchData beendet";
 	$values = $this->m_a_field_values[ $index ];
 
 
-
 // array_walk(debug_backtrace(),create_function('$a,$b','print "{$a[\'function\']}()(".basename($a[\'file\']).":{$a[\'line\']}); ";'));
 
 	if ( count( $values ) < count( $field_names )  ) {
@@ -1439,6 +1780,8 @@ echo "\n FetchData beendet";
 
     public function GetInsertParts( & $str_field_names, & $str_values, & $a_variables ) {
 
+
+// echo "\n variables = ";    var_dump( $a_variables );
 	// Teile eines Inserts zusammentragen
 
 	$str_field_names = '';
@@ -1572,6 +1915,10 @@ class cCommand {
 
     protected $m_is_dbo_active = false;		// true, wenn DBO aktiv ist
 
+    protected $m_obj_command_database_params = null;
+
+    protected $m_a_primary_keys = array( );	// primary key fields
+
 /*
     // the database credentials
 
@@ -1669,12 +2016,28 @@ class cCommand {
 */
     }	// function ResetActions( )
 
+    private function AddPrimaryKeyFields( & $field_name, & $value, & $a_pk_names, & $a_pk_values ) {
+
+	// fügt $field_name zu $a_pk_names und $value zu $a_pk_values hinzu, wenn $field_name ein
+	// Mitglied vom Primary Key ist
+
+	  // if it is a primary key field, then store field name and field valus
+	  if ( $index = array_search( $field_name, $this->m_a_primary_keys ) ) {
+	      $a_pk_names[] = $field_name;
+	      $a_pk_values[] = $value;
+	  }
+
+
+    }	// function AddPrimaryKeyFields( )
+
 
     protected function DoTheExport( ) {
 
 	//
 	// export the randomized data
 	//
+
+	echo "\n starting export";
 
 	static $_started_transaction = false;
 
@@ -1684,10 +2047,33 @@ class cCommand {
 
 	$last = $this->m_act_record_number + $this->m_records_to_export;
 
+	if ( $this->m_database_provider == 'IBM' ) {
+
+	    if ( ! is_null( $this->m_obj_command_database_params ) ) {
+
+		assert( $this->m_obj_command_database_params );
+
+		$user = $this->m_obj_command_database_params->m_user_name;
+
+		$pwd = $this->m_obj_command_database_params->m_user_password;
+
+		$schema = $this->m_obj_command_database_params->m_schema_name;
+
+		if ( strlen( $user ) ) {
+
+		    $this->m_sql_code .= chr( 10 ) . "CONNECT TO {$schema} USER {$user} USING {$pwd};" . chr( 10 );
+		    $this->m_sql_code .= chr( 10 ) . "CONNECT TO {$schema} USER {$user} USING {$pwd};" . chr( 10 );
+
+		}
+
+	    }
+
+	}
 
 	if ( $this->m_database_provider == 'ORACLE' ) {
 	    $this->m_sql_code .= chr( 10 ) . 'SET DEFINE OFF;' . chr( 10 );
 	    $this->m_sql_code .= chr( 10 ) . " ALTER SESSION SET NLS_DATE_FORMAT = 'YYYY-MM-DD HH24:MI:SS'; " . chr( 10 );
+	    $this->m_sql_code .= chr( 10 ) . 'SET SQLBLANKLINES ON;' . chr( 10 );
 	}
 
 
@@ -1695,6 +2081,8 @@ class cCommand {
 
 	    if ( $this->m_database_provider == 'INFORMIX' ) {
 		$this->m_sql_code .= chr( 10 ) . 'BEGIN WORK;' . chr( 10 );
+	    } elseif ( $this->m_database_provider == 'IBM' ) {
+		$this->m_sql_code .= chr( 10 ) . 'UPDATE COMMAND OPTIONS USING c OFF;' . chr( 10 );
 	    } else {
 		$this->m_sql_code .= chr( 10 ) . 'START TRANSACTION;' . chr( 10 );
 	    }
@@ -1708,7 +2096,7 @@ class cCommand {
 
 // 	$begin .= 'BEGIN;' . chr(10);
 
-	if ( $this->m_database_provider == 'INFORMIX' ) {
+	if ( ( $this->m_database_provider == 'INFORMIX' ) || ( $this->m_database_provider == 'IBM' ) ) {
 	    $commit = 'COMMIT WORK;' . chr(10);
 	} else {
 	    $commit = 'COMMIT;' . chr(10);
@@ -1717,7 +2105,9 @@ class cCommand {
 
 	$prefix = chr(10) . 'INSERT INTO ' . $this->m_act_table . '(';
 	$middle = ' ) VALUES ( ';
-	$suffix =  ');' . chr(10);
+
+	// Semikolon am Ende, auch wenn DB2!
+	$suffix =  ')' . ( $this->m_database_provider == 'IBM' ? ';' : ';' ) . chr(10);
 
 	$count_zips = count( $this->m_a_zipcodes );
 	$count_surnames = count( $this->m_a_surnames );
@@ -1725,15 +2115,22 @@ class cCommand {
 	$count_streets = count( $this->m_a_streets );
 	$count_cities = count( $this->m_a_zipcodes );
 
+	$a_obj_string_partitioner = array( );	// array of objects of cStringPartitioner
+
 	$this->m_obj_colors->ColoredCLI( "\n $count_zips zip codes and cities, $count_surnames surnames, $count_prenames prenames and $count_streets streets", 'magenta' );
 
 // 	fwrite( $this->m_filehandle_export, $begin );
 	fwrite( $this->m_filehandle_export, $this->m_sql_code );
 
+	echo "\n exporting records from {$this->m_act_record_number} to {$last}";
+
 	for ( $i = $this->m_act_record_number; $i < $last; $i++ ) {
 
 	    $fields = '';
 	    $values = '';
+
+	    $a_pk_names = array( );	// field names of primary key
+	    $a_pk_values = array( );	// values of primary key
 
 	    $zip_code = $this->m_a_zipcodes[ $zip_rand = rand( 0, $count_zips - 1 ) ][ 0 ];
 	    $city = $this->m_a_zipcodes[ $zip_rand ][ 1 ];
@@ -1743,10 +2140,13 @@ class cCommand {
 	    $prename = $this->m_a_prenames[ rand( 0, $count_prenames - 1 ) ];
 	    if ( rand( 0, 100 ) == 5 ) $prename .= ' ' . $this->m_a_prenames[ rand( 0, $count_prenames - 1 ) ];
 
-
 	    $street = $this->m_a_streets[ rand( 0, $count_streets - 1 ) ] . ' ' . $this->RandomInt( 1, 200 ) ;
 
+
+
 	    for ( $j = 0; $j < count( $this->m_a_changes ); $j++ ) {
+
+		$converted = '';
 
 		if ( is_null( $this->m_a_changes[ $j ] ) ) continue;	// falls RESET ACTIONS erfolgte, dann null
 
@@ -1762,6 +2162,11 @@ class cCommand {
 		    $fields .= $str_field_name;
 		    $values .= $str_value;
 
+		    $this->m_a_variables[ $str_field_name ]  = $str_value;
+
+		    // if it is a primary key field, then store field name and field valus
+		    // $this->AddPrimaryKeyFields( $str_field_name, $str_value, & $a_pk_names, & $a_pk_values );
+
 		} elseif ( $this->m_a_changes[ $j ][ 0 ] == self::__IMPORT_BY_FETCH__ ) {
 
 		    // use the fetch object which is the first paramater
@@ -1771,6 +2176,30 @@ class cCommand {
 		    $fields .= $str_field_names;
 		    $values .= $str_values;
 
+		    //
+
+		    $a_tmp_field_names = explode( ',', $str_field_names );
+		    $a_tmp_field_values = explode( ',', $str_values );
+
+
+		    for ( $k = 0; $k < count( $a_tmp_field_names ); $k++ ) {
+
+			$this->m_a_variables[ $a_tmp_field_names[ $k ] ]  = $a_tmp_field_values[ $k ];
+
+		    }
+/*
+		    // if there are primary key fields, then store field name and field valus
+
+		    $a_tmp_field_names = explode( ',', $str_field_names );
+		    $a_tmp_field_values = explode( ',', $str_values );
+
+		    for ( $j = 0; $j < count( $a_tmp_field_names ); $j++ ) {
+
+			  // if it is a primary key field, then store field name and field valus
+			  $this->AddPrimaryKeyFields( $a_tmp_field_names[ $j ], $a_tmp_field_values[ $j ], & $a_pk_names, & $a_pk_values );
+
+		    }
+*/
 		} elseif ( $this->m_a_changes[ $j ][ 0 ] == self::__IMPORT_CHANGE_SET_RANDOMIZED__ ) {
 
 		    $fields .= $this->m_a_changes[ $j ][ 1 ];
@@ -1781,12 +2210,45 @@ class cCommand {
 					$this->m_a_changes[ $j ][ 5 ]  )
 					;
 
+		    $converted = null;
+
 		    if ( $this->m_a_changes[ $j ][ 2 ] == 'DATETIME' ) {
 
-			if ( $this->m_database_provider == 'INFORMIX' ) {
+			if ( $this->m_database_provider == 'INFORMIX' )  {
 
 			    // $ret = '( ' . $ret . '.000' . ' )::DATETIME YEAR TO FRACTION ';
-			    $values .= " TO_DATE( '{$value}', '%Y-%m-%d %H:%M:%S' ) ";
+			    $converted = " TO_DATE( '{$value}', '%Y-%m-%d %H:%M:%S' ) ";
+
+			} elseif ( $this->m_database_provider == 'IBM' ) {
+
+			    // $ret = '( ' . $ret . '.000' . ' )::DATETIME YEAR TO FRACTION ';
+			    $converted = " TIMESTAMP_FORMAT( '{$value}', 'YYYY-MM-DD HH24:MI:SS' ) ";
+
+			}  elseif ( $this->m_database_provider == 'ORACLE' ) {
+
+			    // $ret = '( ' . $ret . '.000' . ' )::DATETIME YEAR TO FRACTION ';
+			    $converted = " TO_DATE( '{$value}', 'YYYY-MM-DD HH24:MI:SS' ) ";
+
+			}
+
+		    } elseif ( $this->m_a_changes[ $j ][ 2 ] == 'FLOAT' ) {
+
+			if ( $this->m_database_provider == 'ORACLE' ) {
+
+			    // $ret = '( ' . $ret . '.000' . ' )::DATE ';
+
+			    // float ohne Anführungszeichen
+
+			    $converted = $value;
+
+			}
+
+		    } elseif ( $this->m_a_changes[ $j ][ 2 ] == 'TIME' ) {
+
+			if ( $this->m_database_provider == 'ORACLE' ) {
+
+			    // $ret = '( ' . $ret . '.000' . ' )::DATE ';
+			    $converted = " TO_DATE( '{$value}', 'HH24:MI:SS' ) ";
 
 			}
 
@@ -1795,22 +2257,89 @@ class cCommand {
 			if ( $this->m_database_provider == 'INFORMIX' ) {
 
 			    // $ret = '( ' . $ret . '.000' . ' )::DATE ';
-			    $values .= " TO_DATE( '{$value}', '%Y-%m-%d' ) ";
+			    $converted = " TO_DATE( '{$value}', '%Y-%m-%d' ) ";
+
+			} elseif ( $this->m_database_provider == 'ORACLE' ) {
+
+			    // $ret = '( ' . $ret . '.000' . ' )::DATE ';
+			    $converted = " TO_DATE( '{$value}', 'YYYY-MM-DD' ) ";
+
+			} elseif ( $this->m_database_provider == 'IBM' ) {
+
+			    // $ret = '( ' . $ret . '.000' . ' )::DATETIME YEAR TO FRACTION ';
+			    $converted = " TIMESTAMP_FORMAT( '{$value}', 'YYYY-MM-DD' ) ";
 
 			}
 
+		    } elseif ( $this->m_a_changes[ $j ][ 2 ] == 'CHAR' ) {
+
+			// an ORACLE SQL string never may exceed 32 kb
+
+			if ( $this->m_database_provider == 'ORACLE' ) {
+
+			    // $ret = '( ' . $ret . '.000' . ' )::DATE ';
+
+			    if ( strlen( $value ) > 256 ) {
+
+
+				$where = '';
+				$was_here = false;
+				for ( $k = 0; $k < count( $this->m_a_primary_keys ); $k++ ) {
+
+					if ( $was_here ) $where .= ' AND ';
+					$was_here = true;
+
+					//$where .= $a_pk_names[ $k ] . " = '" . $a_pk_values[ $k ] . "'";
+
+					if ( ! isset( $this->m_a_variables[ $this->m_a_primary_keys[ $k ] ] ) ) {
+
+					    die( "\n the primary key field " . $this->m_a_primary_keys[ $k ] . " was not declared early enough" );
+
+					}
+
+					$where .= $this->m_a_primary_keys[ $k ] . " = '" . $this->m_a_variables[ $this->m_a_primary_keys[ $k ] ] . "'";
+
+				}
+
+
+
+				$a_obj_string_partitioner[] = new cStringPartitioner( $value, $this->m_act_table, $this->m_a_changes[ $j ][ 1 ], $this->m_filehandle_export, $this->m_database_provider, $where );
+
+				$converted = "''";
+
+				$value = $converted;
+
+			      } else {
+
+
+				  $converted = "'" . $value . "'";
+
+			      }
+
+			}	// is it ORACLE?
+
+
+		    } // is it a 'CHAR' ?
+
+		    //
+
+		    if ( ( $this->m_a_changes[ $j ][ 2 ] == 'DATETIME' ) && ( $this->m_database_provider == 'IBM' ) ) {
+			; // nop()
+		    } elseif ( ( $this->m_a_changes[ $j ][ 2 ] == 'DATE' ) && ( $this->m_database_provider == 'IBM' ) ) {
+			; // nop()
+		    } else {
+
+			if ( ! strlen( $converted ) ) $converted = "'" . $value . "'";
+
 		    }
-		    {
 
-			$values .= "'" . $value . "'";
-
-		    }
-
-
-		    $this->m_a_variables[ $this->m_a_changes[ $j ][ 1 ] ]  = $value;
+//		    $this->m_a_variables[ $this->m_a_changes[ $j ][ 1 ] ]  = $value;
+		    $this->m_a_variables[ $this->m_a_changes[ $j ][ 1 ] ]  = ( strlen( $converted ) ? $converted : $value );
 
 
 		} elseif ( $this->m_a_changes[ $j ][ 0 ] == self::__IMPORT_CHANGE_SET_SQL__ ) {
+
+		  // set to SQL function
 
 		    $fields .= $this->m_a_changes[ $j ][ 1 ];
 /*
@@ -1821,6 +2350,8 @@ class cCommand {
 						$this->m_a_changes[ $j ][ 5 ] )
 						. "'";
 */
+
+
 		    $values =  $this->m_a_changes[ $j ][ 3 ] ;
 
 		    $this->m_a_variables[ $this->m_a_changes[ $j ][ 1 ] ]  = $this->m_a_changes[ $j ][ 3 ] ;
@@ -1828,8 +2359,15 @@ class cCommand {
 
 		} elseif ( $this->m_a_changes[ $j ][ 0 ] == self::__IMPORT_CHANGE_SET__ ) {
 
+		    // set to a given value
+
+
 		    $fields .= $this->m_a_changes[ $j ][ 1 ];
-		    $values .= "'" . $this->m_a_changes[ $j ][ 2 ] . "'";
+		    if ( $old = false)		     {
+			$values .= "'" . $this->m_a_changes[ $j ][ 2 ] . "'";
+		    }
+
+		    $converted = "'" . $this->m_a_changes[ $j ][ 2 ] . "'";
 
 		    $this->m_a_variables[ $this->m_a_changes[ $j ][ 1 ] ]  = $this->m_a_changes[ $j ][ 2 ] ;
 
@@ -1840,50 +2378,59 @@ class cCommand {
 
 		    if ( $this->m_a_changes[ $j ][ 2 ] == 'ZIPCODE' ) {
 
- 			$values .= "'" . $zip_code . "'";
+ 			$converted = "'" . $zip_code . "'";
  			$this->m_a_variables[ $this->m_a_changes[ $j ][ 1 ] ]  = $zip_code ;
 
 		    } elseif ( $this->m_a_changes[ $j ][ 2 ] == 'SURNAME' ) {
 
- 			$values .= "'" . $surname . "'";
+ 			$converted = "'" . $surname . "'";
  			$this->m_a_variables[ $this->m_a_changes[ $j ][ 1 ] ]  = $surname ;
 
 		    } elseif ( $this->m_a_changes[ $j ][ 2 ] == 'PRENAME' ) {
 
- 			$values .= "'" . $prename . "'";
+ 			$converted = "'" . $prename . "'";
  			$this->m_a_variables[ $this->m_a_changes[ $j ][ 1 ] ]  = $prename ;
 
 		    } elseif ( $this->m_a_changes[ $j ][ 2 ] == 'STREET' ) {
 
- 			$values .= "'" . $street . "'";
+ 			$converted = "'" . $street . "'";
  			$this->m_a_variables[ $this->m_a_changes[ $j ][ 1 ] ]  = $street ;
 
 		    } elseif ( $this->m_a_changes[ $j ][ 2 ] == 'CITY' ) {
 
- 			$values .= "'" . $city . "'";
+ 			$converted = "'" . $city . "'";
  			$this->m_a_variables[ $this->m_a_changes[ $j ][ 1 ] ]  = $city ;
 
 		    } elseif ( $this->m_a_changes[ $j ][ 2 ] == 'UNIQUE' ) {
 
- 			$values .= "'" . $i . "'";
+ 			$converted = "'" . $i . "'";
  			$this->m_a_variables[ $this->m_a_changes[ $j ][ 1 ] ]  = $i ;
 
 		    }
 
-
-
 		}
 
+		$values .= $converted;
 
-
-	    }
+	    }	// for each change
 
 
 	    $sql = $prefix . $fields . $middle . $values . $suffix;
 
+
+	    fwrite( $this->m_filehandle_export, "\n -- "  . round( strlen( $sql ) / 1024, 2 ) . " KB ->\n" );
 	    fwrite( $this->m_filehandle_export, $sql );
 
-	}	// for
+	    // partition long strings - if necessary
+
+	    foreach( $a_obj_string_partitioner as $obj_partitioner ) {
+		$obj_partitioner->AddUpdates( );
+	    }
+
+	    $a_obj_string_partitioner = array( );
+
+
+	}	// for each record
 
 // 	fwrite( $this->m_filehandle_export, $commit );
 
@@ -1911,7 +2458,7 @@ class cCommand {
 	if ( is_resource( $this->m_filehandle_export ) ) {
 
 
-	    if ( $this->m_database_provider == 'INFORMIX' ) {
+	    if ( ( $this->m_database_provider == 'INFORMIX' ) || ( $this->m_database_provider == 'IBM' ) ) {
 		fwrite( $this->m_filehandle_export, chr( 10 ) . 'COMMIT WORK;' . chr( 10 ) );
 	    } else {
 		fwrite( $this->m_filehandle_export, chr( 10 ) . 'COMMIT;' . chr( 10 ) );
@@ -1942,7 +2489,8 @@ class cCommand {
 	    die( "\n program crashed: could not open file '{$this->m_act_filename_export}'" );
 	}
 
-	fwrite( $this->m_filehandle_export, "/* Randomized sql data for mysql database generated with mk-test-data.php ( Rainer Stötter 2016,2017 )*/\n\n\n\n" );
+	fwrite( $this->m_filehandle_export, "/* Randomized sql data for SQL database from type {$this->m_database_provider} generated with the tool mk-sql-data.php ( Rainer Stötter 2016,2017 )*/\n" );
+	fwrite( $this->m_filehandle_export, "/* See https://github.com/rstoetter/mk-sql-data for more*/\n\n\n\n" );
 
     }	// function OpenExportFile( )
 
@@ -2364,7 +2912,7 @@ class cCommand {
 	// Find a randomized time between $start_time and $end_time
 
 
-	$value = rand( $from , $to   ) . ":" . str_pad( rand( 0, 59 ), 2, "0", STR_PAD_LEFT);;
+	$value = rand( $from , $to   ) . ':' . str_pad( rand( 0, 59 ), 2, '0', STR_PAD_LEFT) . ':00';
 
 	return $value;
 
@@ -2472,25 +3020,61 @@ class cCommand {
 
 	$str = & $this->m_long_text;
 
-	if ( ! strlen( $str ) ) die( 'Kann Textvorlage nicht einlesen!' );
-
-	$value = rand( 0, strlen( $str )  ) ;
+	if ( ! strlen( $str ) ) die( 'Program crashed: Could not import the text file!' );
 
 
+	$bottom = rand( 0, strlen( $str )  ) ;
+
+	$len = rand( $min_len, strlen( $str ) -  $min_len );
+
+	if ( $max_len ) $len = min( $len, $max_len );
+
+	if ( $len > 2 ) $len -= 2;
+
+	$part = substr( $str, $bottom, $len );
+
+	if ( $max_len ) $part = substr( $part, 0, $max_len - 1 );
+
+echo "\n RandomText mit [ $min_len .. $max_len ]";
+/*
 	if ( rand( 0, 1 ) ) {
 
-	    $ret = trim( substr( $str, strpos( $str, '.', $value ) + 1 ) );
-	    if ( $max_len ) return substr( $ret, 0, $max_len );
+	    if ( strrpos( $part, '.', $bottom ) ) {
+		$ret = trim( substr( $str, strrpos( $part, '.', $bottom ) + 1 ) );
+	    } else {
+		$ret = trim( substr( $part, $bottom, $len  ) );
+	    }
+
+	    if ( strlen( $ret ) > $max_len ) {
+
+		$ret = substr( $ret, 0, $max_len );
+
+	    }
+
+	    if ( $max_len ) $ret = substr( $ret, 0, $max_len );
 
 	    return $ret;
 
+	} else {
+	    $ret = $part;
 	}
+*/
 
-	$ret = substr( $str, 0, strpos( $str, '.', $value ) );
+	if ( strrpos( $part, '.', $bottom ) ) {
+	    $ret = substr( $part, $bottom, strrpos( $part, '.', $bottom ) );
+	}
 
 	$ret = str_replace( "'", '`', $ret );	// replace delimiters
 
-	if ( $max_len ) return substr( $ret, 0, $max_len );
+	if ( $max_len ) {
+	    return substr( $ret, 0, $max_len - 1 );
+	}
+
+	if ( strlen( $ret ) > $max_len ) {
+
+	    $ret = substr( $ret, 0, $max_len - 1 );
+
+	}
 
 	return $ret;
 
@@ -2575,11 +3159,28 @@ class cCommand {
 
 	    } elseif ( $data_type == 'BOOLEAN' ) {
 
+
 		return $this->RandomBool( );
 
 	    }  elseif ( $data_type == 'CHAR' ) {
 
-		return mysql_escape_string ( $this->RandomText( ) );
+		$txt = $this->RandomText( );
+
+		if ( $this->m_database_provider == 'IBM') {
+
+		    // unter db2 sind keine Multiline-Zeilen möglich
+
+		    $end_lf = ( substr( $txt, strlen( $txt ) - 1, 1  ) == chr( 10 ) );
+
+		    $txt = str_replace( chr( 10 ), "' || chr( 10 ) || '", $txt  );
+
+		    if ( $end_lf ) $txt = $txt . "'";
+
+		}
+
+		// return mysql_escape_string ( $txt ); deprectated function
+		// return addslashes ( $txt );
+		return $txt;
 
 	    }
 
@@ -2600,7 +3201,21 @@ class cCommand {
 
 	    }  elseif ( $data_type == 'CHAR' ) {
 
-		return $this->RandomText( $param2, $param3 );
+	 	$txt = $this->RandomText( $param2, $param3 );
+
+		if ( $this->m_database_provider == 'IBM') {
+
+		    // unter db2 sind keine Multiline-Zeilen möglich
+
+		    $end_lf = ( substr( $txt, strlen( $txt ) - 1, 1  ) == chr( 10 ) );
+
+		    $txt = str_replace( chr( 10 ), "' || chr( 10 ) || '", $txt  );
+
+		    if ( $end_lf ) $txt = $txt . "'";
+
+		}
+
+		return $txt ;
 
 	    }
 
@@ -2682,7 +3297,7 @@ class cCommand {
 
 	$token_next = strtoupper( $this->NextToken( ) );
 
-	if ( $token_next == 'DBO' ) {
+	if ( $token_next == 'PDO' ) {
 
 	    $this->SkipSpaces( );
 	    $token = $this->ScanToken( );
@@ -2691,28 +3306,28 @@ class cCommand {
 	    $token = strtoupper( $this->ScanToken( ) );
 
 	    if ( $token != 'INTERFACE' ) {
-		die ( "\n Program crashed: DBO without INTERFACE detected" );
+		die ( "\n Program crashed: PDO without INTERFACE detected" );
 	    }
 
 	    $this->SkipSpaces( );
 	    $token = strtoupper( $this->ScanToken( ) );
 
 	    if ( $token != 'IS' ) {
-		die ( "\n Program crashed: DBO INTERFACE without IS detected" );
+		die ( "\n Program crashed: PDO INTERFACE without IS detected" );
 	    }
 
 	    $this->SkipSpaces( );
 	    $token = strtoupper( $this->ScanToken( ) );
 
 	    if ( $token != 'ACTIVE' ) {
-		die ( "\n Program crashed: DBO INTERFACE IS without ACTIVE detected" );
+		die ( "\n Program crashed: PDO INTERFACE IS without ACTIVE detected" );
 	    }
 
 	    $this->SkipSpaces( );
 
 	    $this->m_is_dbo_active = true;
 
-	    echo "\n". $this->m_obj_colors->ColoredCLI( 'switching to DBO interface ',  'dark_gray' ) ;
+	    echo "\n". $this->m_obj_colors->ColoredCLI( 'switching to PDO interface ',  'dark_gray' ) ;
 
 	    // assert there follows a semicolon
 	    $this->AssertFollowingSemicolon( );
@@ -2924,6 +3539,59 @@ class cCommand {
 	    $this->AssertFollowingSemicolon( );
 
 
+	} elseif ( $token_next == 'PRIMARY' ) {
+
+	    // Das Token 'PRIMARY' überspringen
+
+	    $this->SkipSpaces( );
+	    $token = $this->ScanToken( );
+	    $this->SkipSpaces( );
+
+	    //
+
+	    $token = $this->ScanToken( );
+
+	    if ( strtoupper( $token ) != 'KEY' ) {
+
+		die ( "\n Program crashed: PRIMARY without 'KEY'" );
+
+	    }
+
+	    $this->SkipSpaces( );
+
+	    $token = $this->ScanToken( );
+
+	    if ( strtoupper( $token ) != 'IS' ) {
+
+		die ( "\n Program crashed: PRIMARY KEY without 'IS'" );
+
+	    }
+
+	    // Parameter einlesen
+
+	    $this->GetTextBetweenDelimiters( $primary_keys );
+
+	    // überspringe das Endzeichen
+	    $this->SkipSpaces( );
+
+	    $primary_keys = trim( $primary_keys );
+
+	    $a_pk = explode( ',', $primary_keys );
+
+	    foreach( $a_pk as & $pk ) {
+
+		$pk = trim( $pk );
+
+	    }
+
+	    $this->m_a_primary_keys = $a_pk;
+
+	    echo "\n PRIMARY KEY IS " ; var_dump( $this->m_a_primary_keys );
+
+	    // assert there follows a semicolon
+	    $this->AssertFollowingSemicolon( );
+
+
 	} elseif ( $token_next == 'DBPARAMS' ) {
 
 
@@ -2976,9 +3644,9 @@ class cCommand {
 
 	    // ask the user for missing credentials
 
-	    echo "\n trying to connect to '{$this->m_database_provider}'";
-	    $obj_command_database_params = new cCommandDatabaseParams( $params, $this->m_database_provider, $this->m_is_dbo_active );
-	    $this->m_mysqli = $obj_command_database_params->GetOpenedDatabase( );
+	    echo "\n trying to connect to '{$this->m_database_provider}';";
+	    $this->m_obj_command_database_params = new cCommandDatabaseParams( $params, $this->m_database_provider, $this->m_is_dbo_active );
+	    $this->m_mysqli = $this->m_obj_command_database_params->GetOpenedDatabase( );
 
 	    // assert there follows a semicolon
 	    $this->AssertFollowingSemicolon( );
@@ -3187,6 +3855,14 @@ class cCommand {
 	    if ( $token === '' ) {
 		echo ( "\n Warning: INCLUDE with empty string " );
 	    }
+
+	    if ( $this->m_database_provider == 'ORACLE' ) {
+		// replace tabs
+		$token = str_replace( chr(9), ' ', $token );
+	    }
+
+	    // replace single wuotes
+	    $token = str_replace( "'", '"', $token );
 
 	    $this->m_user_defined_code .= $token;
 
@@ -3634,6 +4310,8 @@ class cTestdatenGenerator {
       echo "\n Memory Peak (malloc) : " . number_format( memory_get_peak_usage ( false) / 1024 / 1024, 3 , ',', '.' ) . ' MB ';
       echo "\n Time:  " . number_format( ( microtime(true) - $this->m_start_time ), 4) . " Seconds\n";
 
+      echo"\n finished";
+
   }
 
   public function Execute( ) {
@@ -3689,14 +4367,18 @@ class cTestdatenGenerator {
 }	// class cTestdatenGenerator
 
 $opts = getopt( 'c:', array('cfg:') );
-var_dump( $opts );
+echo "\n opts = "; var_dump( $opts );
 
 if ( ( $opts === false ) || ( count( $opts ) == 0 ) ) {
     echo("\n Abbruch: Erwarte Parameter mit Konfigurationsdatei");
     echo("\n mk-test-data.php --cfg <configfile>\n");
 } else {
-    $obj = new cTestdatenGenerator( $opts['cfg'] ) ;
-    $obj->Execute( );
+     try {
+	$obj = new cTestdatenGenerator( $opts['cfg'] ) ;
+	$obj->Execute( );
+     } catch( Exception $e ) {
+ 	echo 'Exception abgefangen: ',  $e->getMessage(), "\n";
+     }
 }
 
 

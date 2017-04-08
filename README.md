@@ -8,8 +8,8 @@ written in English and in German / deutsch
 mk-sql-data is a CLI (command line interface) app
 written in PHP. It is a test data generator. It's aim
 is to give programmers the possibility, to generate
-even large amounts of testing data for MySQL, INFORMIX
-or ORACLE databases on the fly.
+even large amounts of testing data for MySQL, INFORMIX,
+IBM DB2 or ORACLE databases on the fly.
 
 The generation of test data is a boring and time-
 consuming matter. Automatic solutions often fill the
@@ -94,8 +94,8 @@ interface ), welche in PHP programmiert worden ist.
 Es handelt sich um einen Testdatengenerator. Das
 Programm soll Entwicklern die Möglichkeit geben, auf
 die Schnelle sogar große Mengen an Testdaten für eine
-MySQL-, eine INFORMIX- oder eine ORACLE-Datenbank zu
-erzeugen.
+MySQL-, eine INFORMIX-, eine IBM-DB2 oder eine ORACLE-
+Datenbank zu erzeugen.
 
 Testdaten zu erzeugen ist eine langweilige Sache und in
 der Regel sehr zeitaufwendig. Automatisierte Lösungen
