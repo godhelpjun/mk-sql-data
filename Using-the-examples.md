@@ -1,6 +1,6 @@
 Before you can use the following examples you have to prepare things described here: [[Prerequisites]]
 
-[[Examples IBM db2]]
+[[Examples IBM DB2]]
 
 [[Examples Informix]]
 
