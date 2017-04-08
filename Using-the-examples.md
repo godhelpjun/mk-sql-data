@@ -4,3 +4,4 @@ Before you can use the following examples you have to prepare things described h
 
 [[Examples ORACLE]]
 
+[[Examples IBM db2]]
