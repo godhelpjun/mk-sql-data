@@ -8,10 +8,10 @@ Use the program "mysql" in order to execute the SQL commands.
 
 ## Run the example script and create the test data
 ```
-./mk-sql-data.php --cfg mk-sql-data-01.cmd
+./mk-sql-data.php --cfg examples/mk-sql-data-01.cmd
 ```
 
 ## Import the test data into our database
 ```
-mysql -u db2phpsite -pdb2phpsite < output/random-data.sql
+mysql -u db2phpsite -pdb2phpsite < output/randomized-data.sql
 ```
