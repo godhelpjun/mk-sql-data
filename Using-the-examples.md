@@ -2,5 +2,5 @@ Before you can use the following examples you have to prepare things described h
 
 [[example mysql]]
 
-[[example oracle oci]]
+[[Example ORACLE oci]]
 
