@@ -20,7 +20,7 @@ exit
 
 ## Fill the database
 ```
-mysql -u db2phpsite -pdb2phpsite < mk-sql-data-init-mysql.sql
+mysql -u db2phpsite -pdb2phpsite < examples/mk-sql-data-init-mysql.sql
 ```
 
 # Using Oracle
@@ -54,3 +54,11 @@ connect db2phpsite/db2phpsite@192.168.1.65;
 @ './mk-sql-data-init-oracle.sql';
 exit;
 ```
+
+you can fill the database from the client, too with the command
+
+```
+sqlplus64 db2phpsite/db2phpsite@192.168.1.65/XE examples/mk-sql-data-init-oracle.sql
+```
+
+
