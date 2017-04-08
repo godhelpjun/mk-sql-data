@@ -29,6 +29,6 @@ Use the program "mysql" in order to execute the SQL commands.
 
 ## Import the test data into our database
 ```
-mysql -u db2phpsite -pdb2phpsite < output/random-fk-mysql.sql
+mysql -u db2phpsite -pdb2phpsite db2phpsite< output/random-fk-mysql.sql
 ```
 
