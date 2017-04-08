@@ -1,6 +1,6 @@
 ## Revision history of mk-sql-data
 
-- 2017-04-08 supports IBM DB2 and INFORMIX databases
+- 2017-04-08 supports IBM DB2 and INFORMIX databases and PDO (PHP Database Objects)
 - 2017-04-01 supports ORACLE databases
 - 2017-03-28 included Spanish test data
 - 2017-03-28 asking now the user for empty credentials
