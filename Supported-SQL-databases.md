@@ -3,7 +3,7 @@
 
 | SQL database  | Native interface  | PDO-interface      |
 | ------------- | ------------------ | ----------------- |
-| IBM DB/2      |                    |                   |
+| IBM DB/2      |                    |         X         |
 | Informix      |                    |         X         |
 | MySQL         |          X         |         X         |
 | Oracle        |          X         |         X         |
