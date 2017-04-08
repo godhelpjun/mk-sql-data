@@ -19,3 +19,13 @@
 | Oracle         | [[Install ORACLE oci8]]  | [[Install pdo_oci]]      |
 | PostgreSQL     |                          |                          |
 
+## Testhilfen
+
+| SQL Datenbank  | Natives Interface        | PDO-Schnittstelle        |
+| -------------- | ------------------------ | -------------------------|
+| IBM DB/2       | [[Examples IBM DB2]]     | [[Examples IBM DB2]]     |
+| Informix       |                          | [[Examples Informix]]    |
+| MySQL          | [[Examples MySQL]]       | [[Examples MySQL]]       |
+| Oracle         | [[Examples ORACLE]]      | [[Examples ORACLE]]      |
+| PostgreSQL     |                          |                          |
+
