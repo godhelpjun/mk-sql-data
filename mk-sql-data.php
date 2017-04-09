@@ -11,31 +11,144 @@ error_reporting( E_STRICT );
 
 
 /*
-cColorsCLI:: (4 methods):
-  __construct()
-  ColoredCLI()
-  getForegroundColors()
-  getBackgroundColors()
 
-cConfigFile:: (9 methods):
+Defines 17 classes
+
+cDB2ResultSmall:: (6 methods):
   __construct()
   __destruct()
-  IsDone()
+  close()
+  fetch_array()
+  fetch_assoc()
+  fetch_row()
+
+cDB2Small:: (9 methods):
+  Connect()
+  DumpClientInfo()
+  Execute()
+  GetError()
+  GetErrorMessage()
+  __construct()
+  __destruct()
+  close()
+  query()
+
+cStringPartitioner:: (3 methods):
+  __construct()
+  __destruct()
+  AddUpdates()
+
+cPdoResultSmall:: (6 methods):
+  __construct()
+  __destruct()
+  close()
+  fetch_array()
+  fetch_assoc()
+  fetch_row()
+
+cPdoSmall:: (6 methods):
+  GetError()
+  GetErrorMessage()
+  __construct()
+  __destruct()
+  close()
+  query()
+
+cInformixResultSmall:: (6 methods):
+  __construct()
+  __destruct()
+  close()
+  fetch_array()
+  fetch_assoc()
+  fetch_row()
+
+cInformixSmall_UNTESTED:: (8 methods):
+  Connect()
+  Execute()
+  GetError()
+  GetErrorMessage()
+  __construct()
+  __destruct()
+  close()
+  query()
+
+cOracleResultSmall:: (6 methods):
+  __construct()
+  __destruct()
+  close()
+  fetch_array()
+  fetch_assoc()
+  fetch_row()
+
+cOracleSmall:: (12 methods):
+  Connect()
+  Execute()
+  GetBindingType()
+  GetError()
+  GetExecuteStatus()
+  SetAutoCommit()
+  SetFetchMode()
+  SetNlsLang()
+  __construct()
+  __destruct()
+  close()
+  query()
+
+cCredentialsReader:: (4 methods):
+  ReadCredentials()
+  ReadLine()
+  ReadPassword()
+  __construct()
+
+cColorsCLI:: (2 methods):
+  __construct()
+  ColoredCLI()
+
+cConfigFile:: (10 methods):
+  ActCh()
   GetCh()
-  SkipSpaces()
-  SkipComment()
-  SkipCharsUntilCommand()
+  IsDone()
   ReadCommand()
   ScanUntilFolgezeichen()
+  SkipCharsUntilCommand()
+  SkipComment()
+  SkipSpaces()
+  __construct()
+  __destruct()
 
-cCommand:: (38 methods):
+cCommandDatabaseParams:: (4 methods):
+  GetOpenedDatabase()
+  ReadCredentials()
+  __construct()
+  __destruct()
+
+cCommandIncrement:: (3 methods):
+  GetInsertParts()
+  __construct()
+  __destruct()
+
+cCommandFetch:: (6 methods):
+  FetchData()
+  GetInsertParts()
+  GetRandomizedFetchData()
+  ReplaceFieldVars()
+  __construct()
+  __destruct()
+
+cCommand:: (46 methods):
+  ActCh()
+  AddPrimaryKeyFields()
+  AssertFollowingSemicolon()
   CloseExportFile()
   DoTheExport()
   ExecuteCommand()
+  FollowsDelimiter()
   GetCh()
+  GetTextBetweenDelimiters()
   ImportTextData()
   ImportTheTextdata()
   IsDone()
+  MakePath()
   NextToken()
   OpenExportFile()
   RandomASCII()
@@ -67,17 +180,257 @@ cCommand:: (38 methods):
   __destruct()
   is_ctype_identifier()
   is_ctype_identifier_start()
+  is_ctype_number()
+  is_ctype_number_start()
 
 cTestdatenGenerator:: (4 methods):
   __construct()
   __destruct()
   Execute()
   WriteHeader()
+
+  */
+
+class cPostgreResultSmall {
+
+    // a basic subset of the ibm db2 operations hidden behind a class
+
+    const RESULT_BOTH = MYSQLI_BOTH;
+    const RESULT_ASSOC = MYSQLI_ASSOC;
+    const RESULT_NUM = MYSQLI_NUM;
+
+    protected $m_id_statement = null;
+
+    public $num_rows = -1;
+
+    function __construct( $id_statement ) {
+
+	assert( $id_statement !== false );
+
+	$this->m_id_statement = $id_statement;
+
+	 $this->num_rows = pg_num_rows( $this->m_id_statement );
+
+    }	// function __destruct( )
+
+    function __destruct( ) {
+
+	$this->close( );
+
+    }	// function __destruct( )
+
+    public function fetch_array( $resulttype = self::RESULT_BOTH ){
+
+	// Fetch a result row as an associative, a numeric array, or both
+
+        if ( $resulttype == self::RESULT_ASSOC ) {
+
+	    return $this->fetch_assoc( );
+
+        } elseif ( $resulttype == self::RESULT_NUM ) {
+
+	    return $this->pg_fetch_row( $this->m_id_statement );
+
+        }
+
+        // self::RESULT_BOTH
+
+        $ary = $this->fetch_assoc( );
+
+        $keys = array_keys( $ary );
+        $values = array_values( $ary );
+
+        for( $i = 0; $i < count( $keys ); $i++ ) {
+
+	    $ary[ $keys[ $i ] ] = $values[ $i ];
+
+        }
+
+        return $ary;
+
+    }
+
+    public function fetch_row( ){
+
+	// Get a result row as an enumerated array
+
+        return pg_fetch_row( $this->m_id_statement );
+    }
+
+    public function fetch_assoc( ){
+
+
+        return pg_fetch_assoc( $this->m_id_statement );
+
+    }
+
+    public function close( ) {
+
+	// nop - no operation
+
+	if ( is_resource( $this->m_id_statement ) ) {
+
+	    pg_free_result ( $this->m_id_statement );
+
+	    $this->m_id_statement = null;
+
+	}
+
+    }  // function close( )
+
+}	// class cPostgreResultSmall
+
+
+class cPostgreSmall {
+
+    // a basic subset of the db2 operations hidden behind a class
+
+    // TODO: cursor_type berücksichtigen!
+
+    protected $m_connection_handle = null;
+
+    protected $m_fetch_mode = cInformixResultSmall::RESULT_BOTH;
+
+    protected $m_last_query = '';
+
+
+    private function Execute( $sql ){
+
+	static $counter = 0;
+
+
+	assert( is_resource( $this->m_connection_handle ) );
+
+        if ( ! is_resource( $this->m_connection_handle ) ) {
+	    return false;
+	}
+
+        $this->m_last_query = $sql;
+
+	$prep_result = pg_prepare( $this->m_connection_handle, "my_query_" . $counter, $sql );
+
+	$id_statement = pg_execute( $this->m_connection_handle, "my_query_" . $counter, array( ) );
+
+        // $id_statement = db2_exec( $this->m_connection_handle, $sql, array( 'cursor' => DB2_SCROLLABLE )  );
+
+	if (! $id_statement ) {
+	  assert( false == true );
+	  debug_print_backtrace( );
+	  echo "\n error executing sql: '{$sql}'";
+	  exit;
+	}
+
+        $result = $id_statement;
+
+        $counter++;
+
+        return $result;	// false when not successful
+    }
+
+
+    protected function Connect( $connection_string = '', $user = '', $password = '' ){
+
+	// connection_string ist database!
+
+/*
+
+ Der connection_string darf leer sein, dann werden Standard-Parameter benutzt. Er kann auch einen oder mehrere
+ Parameter, durch Leerzeichen getrennt, enthalten. Jeder Parameter muss in der Form keyword = value angegeben werden,
+ wobei das Gleichheitzeichen optional ist. Um einen leeren Wert oder einen Wert, der Leerzeichen enthält, zu
+ übergeben, muss dieser in einfache Anführungszeichen eingeschlossen sein, etwa so: keyword = 'ein Wert'. Einfache
+ Anführungszeichen oder Backslashes innerhalb von Werten müssen mit einem Backslash maskiert werden: \' und \\.
+
+ Diese Schlüsselwörter für die Parameter werden aktuell erkannt: host, hostaddr, port, dbname (standardmäßig der Wert
+ von user), user, password, connect_timeout, options, tty (wird ignoriert), sslmode, requiressl (zugunsten von sslmode
+ ausgemustert) und service. Welche dieser Parameter zur Verfügung stehen, ist von Ihrer PostgreSQL-Version abhängig.
+
 */
+
+	$conn_str_2 = strtoupper( str_replace( ' ', '', $connection_string ) );
+	$connection_string_new = $connection_string;
+
+	if ( strlen( $user ) ) {
+	    if ( ! strstr( strtoupper( $conn_str_2, 'USER=' ) ) ) {
+		$connection_string_new .= ' ' . ' user=' . $user;
+	    }
+	}
+
+	if ( strlen( $password ) ) {
+	    if ( ! strstr( strtoupper( $conn_str_2, 'PASSWORD=' ) ) ) {
+		$connection_string_new .= ' ' . ' password=' . $password;
+	    }
+	}
+
+	$this->m_connection_handle = pg_connect ( $connection_string_new );
+
+	if ( $this->m_connection_handle === false ) {
+	    die( "\n error connecting to '{$connection_string}' with user '{$user}'" );
+	}
+
+
+      return $this->m_connection_handle;	// FALSE oder handle
+    }
+
+
+
+    public function query( $sql ){
+
+        $id_statement = $this->Execute( $sql );
+
+        return  ( $id_statement !== false ?  new cPostgreResultSmall( $id_statement ) : false );
+
+    }
+
+    public function close( ) {
+
+	if ( $this->m_connection_handle !== false ) {
+
+	    pg_close( $this->m_connection_handle );
+
+	    $this->m_connection_handle = false;
+
+	  }
+
+    }
+
+   public function GetError(){
+        return @pg_last_error(  $this->m_connection_handle );
+    }
+
+   public function GetErrorMessage(){
+        return @pg_last_error(  $this->m_connection_handle );
+    }
+
+
+    public function __construct(
+			  $host = '',
+			  $user = '',
+			  $password = '',
+			  $database = ''
+			  ) {
+
+	// in $this->m_connection_handle ist der Handle des Datenbank-Connects gespeichert
+
+
+	$database = trim( $database );
+
+        $this->Connect( $host, $user, $password );
+
+    }
+
+    function __destruct( ) {
+
+	$this->close( );
+
+    }	// function __destruct( )
+
+}  // class cPostgreSmall
+
+
 
 class cDB2ResultSmall {
 
-    // a basic subset of the oci operations hidden behind a class
+    // a basic subset of the ibm db2 operations hidden behind a class
 
     const RESULT_BOTH = MYSQLI_BOTH;
     const RESULT_ASSOC = MYSQLI_ASSOC;
@@ -449,7 +802,7 @@ class cPdoResultSmall {
 	    // PHP Fatal Error. Second Argument Has To Be An Integer, But PDOException::getCode Returns A
 	    // String.
 
-	    echo "\n available drivers:";
+	    echo "\n available PDO drivers:";
 	    foreach( PDO::getAvailableDrivers( ) as $driver)
 		echo $driver, "\n";
 
@@ -1523,6 +1876,17 @@ class cCommandDatabaseParams {
 		    $obj_credentials->m_schema_name
 		);
 
+	    } elseif ( $this->m_database_provider == 'PGSQL' ) {
+
+		echo "\n connecting to POSTGRESQL";
+
+		$mysqli = new cPostgreSmall(
+		    $obj_credentials->m_host_name,
+		    $obj_credentials->m_user_name,
+		    $obj_credentials->m_user_password,
+		    $obj_credentials->m_schema_name
+		);
+
 	    } else {
 
 		die( "\n unknown database provider '{$this->m_database_provider}'" );
@@ -1644,7 +2008,7 @@ class cCommandIncrement {
 	if ( $this->m_database_provider == 'ORACLE' || $this->m_database_provider == 'INFORMIX' ) {
 	    // $str_value = "( SELECT CASE WHEN ISNULL( MAX( {$str_field_name} ) ) THEN 1 ELSE MAX( {$str_field_name} ) + 1 ) FROM {$table_name} XXX {$where} )";
 	    $str_value = "( SELECT NVL( MAX( {$str_field_name} ), 0 ) + 1 FROM {$table_name} XXX {$where} )";
-	} elseif ( $this->m_database_provider == 'IBM' ) { // seems to have no alias
+	} elseif ( ( $this->m_database_provider == 'IBM' ) || ( $this->m_database_provider == 'PGSQL' ) ) { // seems to have no alias
 	    $str_value = "( SELECT COALESCE( MAX( {$str_field_name} ), 0 ) + 1 FROM {$table_name} AS X___XXX___ {$where} )";
 	} else {
 	    $str_value = "( SELECT IF( ISNULL( MAX( {$str_field_name} ) ), 1, MAX( {$str_field_name} ) + 1 ) FROM {$table_name} AS _XXX_ {$where} )";
@@ -1766,12 +2130,13 @@ class cCommandFetch {
 
 	$values = $this->m_a_field_values[ $index ];
 
-
-// array_walk(debug_backtrace(),create_function('$a,$b','print "{$a[\'function\']}()(".basename($a[\'file\']).":{$a[\'line\']}); ";'));
-
 	if ( count( $values ) < count( $field_names )  ) {
 
-	    die( "\n program crashed: sql returns no rows! \n {$this->m_sql}" );
+	    echo "\n values: " . count( $values ) . ' and names: ' . count( $field_names );
+	    echo "\n values: " ; var_dump( $values ) ;
+	    echo "\n and names: " ; var_dump( $field_names );
+
+	    die( "\n program crashed: sql returns no rows! \n sql was: {$this->m_sql}" );
 
 	}
 
@@ -3521,7 +3886,8 @@ echo "\n RandomText mit [ $min_len .. $max_len ]";
 	    if ( is_null( $this->m_mysqli ) ) die( "\n Abbruch: ohne DB_PARAMS ist FETCH nicht möglich" );
 
 	    // eventuell noch Feldvariablen ersetzen?
-
+echo "\n fetch with $str_sql";
+echo "\n replacing field vars";
 	    foreach ( $this->m_a_fetched as $fetched ) {
 
 		$fetched->ReplaceFieldVars( $str_sql );
@@ -3638,7 +4004,7 @@ echo "\n RandomText mit [ $min_len .. $max_len ]";
 		    $this->m_database_provider = 'ORACLE';
 		}
 
-		echo "\n". $this->m_obj_colors->ColoredCLI( 'using DBO in order to access ' . $this->m_database_provider,  'dark_gray' ) ;
+		echo "\n". $this->m_obj_colors->ColoredCLI( 'using PDO in order to access ' . $this->m_database_provider,  'dark_gray' ) ;
 
 	    }
 
@@ -4367,7 +4733,7 @@ class cTestdatenGenerator {
 }	// class cTestdatenGenerator
 
 $opts = getopt( 'c:', array('cfg:') );
-echo "\n opts = "; var_dump( $opts );
+// echo "\n opts = "; var_dump( $opts );
 
 if ( ( $opts === false ) || ( count( $opts ) == 0 ) ) {
     echo("\n Abbruch: Erwarte Parameter mit Konfigurationsdatei");
