@@ -5,9 +5,11 @@ error_reporting( E_STRICT );
 
 /*
  *
- *	The app mk-sql-data is licensed under the terms of the MIT license
+ *	The program mk-sql-data is licensed under the terms of the MIT license
  *	(c) Rainer Stötter 2016-2017
  */
+
+// require_once( __DIR__ . '/classes/cColorsCLI.class.php');
 
 
 /*
@@ -1521,38 +1523,50 @@ class cCredentialsReader {
 
 	// a good idea of agarzon - https://gist.github.com/agarzon - completely rewritten
 
+
+	private $m_a_attributes = array(
+
+	    'bold' =>  '1',
+	    'dim' =>  '2',
+	    'underline' =>  '4',
+	    'blink' =>  '5',
+	    'reverse' =>  '7',
+	    'hidden' =>  '8'
+	);
+
+
 	private $m_a_fg_colors = array(
 
-	    array( 'black' =>  '0;30'),
-	    array( 'dark_gray' =>  '1;30'),
-	    array( 'blue' =>  '0;34'),
-	    array( 'light_blue' =>  '1;34'),
-	    array( 'green' =>  '0;32'),
-	    array( 'light_green' =>  '1;32'),
-	    array( 'cyan' =>  '0;36'),
-	    array( 'light_cyan' =>  '1;36'),
-	    array( 'red' =>  '0;31'),
-	    array( 'light_red' =>  '1;31'),
-	    array( 'purple' =>  '0;35'),
-	    array( 'light_purple' =>  '1;35'),
-	    array( 'brown' =>  '0;33'),
-	    array( 'yellow' =>  '1;33'),
-	    array( 'light_gray' =>  '0;37'),
-	    array( 'white' =>  '1;37')
+	    'black' =>  '0;30',
+	    'dark_gray' =>  '1;30',
+	    'blue' =>  '0;34',
+	    'light_blue' =>  '1;34',
+	    'green' =>  '0;32',
+	    'light_green' =>  '1;32',
+	    'cyan' =>  '0;36',
+	    'light_cyan' =>  '1;36',
+	    'red' =>  '0;31',
+	    'light_red' =>  '1;31',
+	    'purple' =>  '0;35',
+	    'light_purple' =>  '1;35',
+	    'brown' =>  '0;33',
+	    'yellow' =>  '1;33',
+	    'light_gray' =>  '0;37',
+	    'white' =>  '1;37'
 
 	);
 
 
 	private $m_a_bg_colors = array(
 
-	    array( 'black' => '40' ),
-	    array( 'red' => '41' ),
-	    array( 'green' => '42' ),
-	    array( 'yellow' => '43' ),
-	    array( 'blue' => '44' ),
-	    array( 'magenta' => '45' ),
-	    array( 'cyan' => '46' ),
-	    array( 'light_gray' => '47' )
+	    'black' => '40' ,
+	    'red' => '41' ,
+	    'green' => '42' ,
+	    'yellow' => '43' ,
+	    'blue' => '44' ,
+	    'magenta' => '45' ,
+	    'cyan' => '46' ,
+	    'light_gray' => '47'
 	);
 
 	function __construct() {
@@ -1563,20 +1577,33 @@ class cCredentialsReader {
 	public function ColoredCLI(
 			    $str_output,
 			    $fg_color = null,
-			    $bg_color = null
+			    $bg_color = null,
+			    $attr = null
 			    ) {
 
-		$str_colored = "";
 		$praefix = "\033[";
 		$suffix = "\033[0m";
 
+		$reset_attr = '\e[0m';
+
+		$str_colored = '';
+
+
+		if ( ( ! is_null( $attr ) ) && ( isset( $this->m_a_attributes[ $attr ] ) ) ) {
+  		    $str_colored = '\e[' . $this->m_a_attributes[ $attr ] . ';' ;
+		}
+
+
+// 		if ( isset( $this->m_a_attributes[ $attr ] ) ) {
+// 		    $praefix = '';
+// 		}
 
 		if ( isset( $this->m_a_fg_colors[ $fg_color ] ) ) {
-		    $str_colored .= $praefix . $this->m_a_fg_colors[ $fg_color ] . "m";
+		    $str_colored .= ' ' . $praefix . $this->m_a_fg_colors[ $fg_color ] . "m";
 		}
 
 		if ( isset( $this->m_a_bg_colors[ $bg_color ] ) ) {
-		    $str_colored .= $praefix . $this->m_a_bg_colors[ $bg_color ] . "m";
+		    $str_colored .= ' ' . $praefix . $this->m_a_bg_colors[ $bg_color ] . "m";
 		}
 
 		$str_colored .=  $str_output . $suffix;
@@ -1589,6 +1616,10 @@ class cCredentialsReader {
  }	// class cColorsCLI
 
 class cConfigFile {
+
+    //
+    // parses the entries in the configuration script
+    //
 
     protected $m_filehandle = null;
     protected $m_filename = '';
@@ -1766,12 +1797,16 @@ class cConfigFile {
 
 class cCommandDatabaseParams {
 
+    //
+    //  class for the command DBPARAMS - interprets the command and connects to the database
+    //
+
     public $m_host_name = '';
     public $m_schema_name = '';
     public $m_user_name = '';
     public $m_user_password = '';
     public $m_database_provider = '';
-    public $m_is_dbo_active = false;
+    public $m_is_pdo_active = false;
 
     function __construct( $str_params, $database_provider, $is_dbo_active = false ) {
 
@@ -1795,7 +1830,7 @@ class cCommandDatabaseParams {
 	$this->m_schema_name = $a_params[ 1 ];
 	$this->m_user_name = $a_params[ 2 ];
 	$this->m_user_password = $a_params[ 3 ];
-	$this->m_is_dbo_active = $is_dbo_active;
+	$this->m_is_pdo_active = $is_dbo_active;
 
 	$this->m_database_provider = strtoupper( trim( $database_provider ) );
 
@@ -1821,7 +1856,7 @@ class cCommandDatabaseParams {
 
 	    echo "\n trying to connect to the database server";
 
-	  if ( $this->m_is_dbo_active ) {
+	  if ( $this->m_is_pdo_active ) {
 
 		echo "\connecting to PDO";
 
@@ -1933,11 +1968,8 @@ class cCommandDatabaseParams {
 
 	$mysqli = $this->ReadCredentials( );
 
-        if ( $mysqli === false ) {
-
-	    die( "\n could not open the database '{$this->m_schema_name}' - check the credentials!" );
-
-        }
+	$msg = "could not open the database '{$this->m_schema_name}' - check the credentials!" ;
+	$this->DieIf( $mysqli === false, $msg );
 
         echo "\n established database connection";
 
@@ -1947,10 +1979,27 @@ class cCommandDatabaseParams {
 
     }	// function GetOpenedDatabase( )
 
+    protected function DieIf( $expression = true, $txt = '' ) {
+
+	//
+	// cancel the program execution, when the condition is true
+	//
+
+	if ( $expression ) {
+	    echo $this->m_obj_colors->ColoredCLI( "\n {$txt}", 'red' );
+	    die("\n aborting program");
+	}
+
+    }	// function DieIf( )
+
 }	// class cCommandDatabaseParams
 
 
 class cCommandIncrement {
+
+    //
+    // class, which implements the INCREMENT command
+    //
 
     public $m_field_name = '';
     public $m_a_increment_vars = array( );
@@ -2027,6 +2076,10 @@ class cCommandIncrement {
 
 class cCommandFetch {
 
+    //
+    // class, which implements the FETCH command
+    //
+
     protected $m_mysqli = null;
 
     protected $m_sql = '';			// Das SQL, welches die Daten für die Feldnamen liefert
@@ -2079,18 +2132,14 @@ class cCommandFetch {
 	$result = $this->m_mysqli->query( $this->m_sql );
 
 	if ( $result === false ) {
-
 	    printf("\nFetchData: \n Errormessage: %s \n SQL: %s", $this->m_mysqli->error, $this->m_sql );
-	    die( "\n Abbruch wegen Datenbankfehler" );
+	    $msg = " Abbruch wegen Datenbankfehler" ;
+	    $this->DieIf( $result === false, $msg );
+	}
 
-	} else {
+	while ( $row = $result->fetch_row( ) ) {
 
-
- 	   while ( $row = $result->fetch_row( ) ) {
-
-		$this->m_a_field_values[] = $row;;
-
-	    }
+	    $this->m_a_field_values[] = $row;;
 
 	}
 
@@ -2136,7 +2185,7 @@ class cCommandFetch {
 	    echo "\n values: " ; var_dump( $values ) ;
 	    echo "\n and names: " ; var_dump( $field_names );
 
-	    die( "\n program crashed: sql returns no rows! \n sql was: {$this->m_sql}" );
+	    $this->dieif( true, "program crashed: sql returns no rows! \n sql was: {$this->m_sql}" );
 
 	}
 
@@ -2186,10 +2235,7 @@ class cCommandFetch {
 
 
 
-
-
-
-class cCommand {
+class cCommandInterpreter {
 
     //
     // liest das Konfigurationsskript ein und führt es aus.
@@ -2278,7 +2324,7 @@ class cCommand {
 
     protected $m_user_defined_code = '';	// vom Benutzer initiierter Code - delete from und insert
 
-    protected $m_is_dbo_active = false;		// true, wenn DBO aktiv ist
+    protected $m_is_pdo_active = false;		// true, wenn DBO aktiv ist
 
     protected $m_obj_command_database_params = null;
 
@@ -2303,6 +2349,12 @@ class cCommand {
       $this->m_a_zipcodes = array( );		// Die importierten Postleitzahlen samt Stadt - zweispaltig
       $this->m_long_text = '';			// Der Langtext
 
+      $this->m_a_changes = array( );
+      $this->m_a_variables = array( );
+      $this->m_a_fetched = array( );
+      // $this->m_is_pdo_active = false;
+      $this->m_a_primary_keys = array( );
+
     }	// function ResetData( )
 
 
@@ -2314,6 +2366,20 @@ class cCommand {
 		;
 
     }	// function FollowsDelimiter( )
+
+    protected function DieIf( $expression = true, $txt = '' ) {
+
+	//
+	// cancel the program execution, when the expression is true
+	//
+
+	if ( $expression ) {
+	    echo "\n active command is '{$this->m_command}'";
+	    echo $this->m_obj_colors->ColoredCLI( "\n {$txt}", 'red' );
+	    die("\n aborting program");
+	}
+
+    }	// function DieIf( )
 
     protected function GetTextBetweenDelimiters( & $text, $do_trim = true ) {
 
@@ -2327,12 +2393,8 @@ class cCommand {
 
 	$zeichen = $this->ActCh( );
 
-	if ( ! $this->FollowsDelimiter( ) ) {
-
-	    echo "\n {$this->m_command} ";
-	    die( "\n program crashed: delimiter expected, got '" . $this->ActCh( ) . "'" );
-
-	}
+	$msg = "\n program crashed: delimiter expected, got '" . $this->ActCh( ) . "'" ;
+	$this->DieIf( ! $this->FollowsDelimiter( ), $msg );
 
 	// zunächst die Feldliste einlesen
 
@@ -2346,8 +2408,8 @@ class cCommand {
 	} elseif ( $zeichen == '`' ) {
 	    $text = $this->ScanUntilFolgezeichen( $zeichen );
 	} else {
-	    echo "\n {$this->m_command}";
-	    die( "\n Abbruch: kein valider Delimiter nach 'FETCH' ({$zeichen})" );
+	    $msg = "\n Abbruch: kein valider Delimiter nach 'FETCH' ({$zeichen})" ;
+	    $this->DieIf( true, $msg );
 	}
 
 	if ( $do_trim ) $text = trim( $text );
@@ -2918,7 +2980,7 @@ class cCommand {
 
 	  } else {
 
-	      die("\n program aborted: cannot handle $anzahl_spalten columns!");
+	      $this->DieIf( true, "program aborted: cannot handle $anzahl_spalten columns!");
 
 	  }
 
@@ -2957,7 +3019,7 @@ class cCommand {
 		$ary = & $this->m_long_text;
 		$anzahl_spalten = 0;
     	    } else {
-		die( "\n program crashed: READ FROM with unknown token '{$token}'" );
+		$this->DieIf( true, "program crashed: READ FROM with unknown token '{$token}'" );
     	    }
 
     	    $this->ImportTheTextdata( $file_name, $anzahl_spalten, $ary );
@@ -3007,12 +3069,7 @@ class cCommand {
 
 	$this->SkipSpaces( );
 
-	if ( $this->m_chr != ';' ) {
-
-	    die( "\n aborting: error: semicolon expected, but '{$this->m_chr}' detected in command '{$this->m_command}'" );
-
-	}
-
+	$this->DieIf( $this->m_chr != ';' ,  "aborting: error: semicolon expected, but '{$this->m_chr}' detected in command '{$this->m_command}'" );
 
     }	// function AssertFollowingSemicolon( )
 
@@ -3043,11 +3100,7 @@ class cCommand {
 
 	}
 
-	if ( $this->m_chr == '' ) {
-
-	    die( "\n aborting: error: expected '$zeichen' but reached the string end in \n $this->m_command" );
-
-	}
+	$this->DieIf( $this->m_chr == '', "aborting: error: expected '$zeichen' but reached the string end in \n $this->m_command" );
 
 	return $content;
 
@@ -3385,7 +3438,7 @@ class cCommand {
 
 	$str = & $this->m_long_text;
 
-	if ( ! strlen( $str ) ) die( 'Program crashed: Could not import the text file!' );
+	$this->DieIf( ! strlen( $str ),  'Program crashed: Could not import the text file!' );
 
 
 	$bottom = rand( 0, strlen( $str )  ) ;
@@ -3400,7 +3453,6 @@ class cCommand {
 
 	if ( $max_len ) $part = substr( $part, 0, $max_len - 1 );
 
-echo "\n RandomText mit [ $min_len .. $max_len ]";
 /*
 	if ( rand( 0, 1 ) ) {
 
@@ -3670,27 +3722,21 @@ echo "\n RandomText mit [ $min_len .. $max_len ]";
 	    $this->SkipSpaces( );
 	    $token = strtoupper( $this->ScanToken( ) );
 
-	    if ( $token != 'INTERFACE' ) {
-		die ( "\n Program crashed: PDO without INTERFACE detected" );
-	    }
+	    $this->DieIf( $token != 'INTERFACE', "Program crashed: PDO without INTERFACE detected" );
 
 	    $this->SkipSpaces( );
 	    $token = strtoupper( $this->ScanToken( ) );
 
-	    if ( $token != 'IS' ) {
-		die ( "\n Program crashed: PDO INTERFACE without IS detected" );
-	    }
+	    $this->DieIf( $token != 'IS', "Program crashed: PDO INTERFACE without IS detected" );
 
 	    $this->SkipSpaces( );
 	    $token = strtoupper( $this->ScanToken( ) );
 
-	    if ( $token != 'ACTIVE' ) {
-		die ( "\n Program crashed: PDO INTERFACE IS without ACTIVE detected" );
-	    }
+	    $this->DieIf( $token != 'ACTIVE', "\n Program crashed: PDO INTERFACE IS without ACTIVE detected" );
 
 	    $this->SkipSpaces( );
 
-	    $this->m_is_dbo_active = true;
+	    $this->m_is_pdo_active = true;
 
 	    echo "\n". $this->m_obj_colors->ColoredCLI( 'switching to PDO interface ',  'dark_gray' ) ;
 
@@ -3705,16 +3751,12 @@ echo "\n RandomText mit [ $min_len .. $max_len ]";
 	    $this->SkipSpaces( );
 	    $token = strtoupper( $this->ScanToken( ) );
 
-	    if ( $token != 'PROVIDER' ) {
-		die ( "\n Program crashed: DATABASE without PROVIDER detected" );
-	    }
+	    $this->DieIf( $token != 'PROVIDER', "Program crashed: DATABASE without PROVIDER detected" );
 
 	    $this->SkipSpaces( );
 	    $token = strtoupper( $this->ScanToken( ) );
 
-	    if ( $token != 'IS' ) {
-		die ( "\n Program crashed: DATABASE PROVIDER without IS detected" );
-	    }
+	    $this->DieIf ( $token != 'IS', "Program crashed: DATABASE PROVIDER without IS detected" );
 
 	    $this->SkipSpaces( );
 
@@ -3740,16 +3782,12 @@ echo "\n RandomText mit [ $min_len .. $max_len ]";
 	    $this->SkipSpaces( );
 	    $token = strtoupper( $this->ScanToken( ) );
 
-	    if ( $token != 'DELETE' ) {
-		die ( "\n Program crashed: DO without DELETE detected" );
-	    }
+	    $this->DieIf( $token != 'DELETE',  "Program crashed: DO without DELETE detected" );
 
 	    $this->SkipSpaces( );
 	    $token = strtoupper( $this->ScanToken( ) );
 
-	    if ( $token != 'FROM' ) {
-		die ( "\n Program crashed: DO DELETE without FROM detected" );
-	    }
+	    $this->DieIf ( $token != 'FROM', "Program crashed: DO DELETE without FROM detected" );
 
 	    $this->SkipSpaces( );
 
@@ -3768,9 +3806,9 @@ echo "\n RandomText mit [ $min_len .. $max_len ]";
 	    }
 
 	    if ( $where == '' ) {
-		$this->m_user_defined_code .= "\n DELETE FROM $table_name;";
+		$this->m_user_defined_code .= "\n DELETE FROM {$table_name};";
 	    } else {
-		$this->m_user_defined_code .= "\n DELETE FROM $table_name where " . $where . ';';
+		$this->m_user_defined_code .= "\n DELETE FROM {$table_name} where " . $where . ';';
 	    }
 
 	    echo "\n". $this->m_obj_colors->ColoredCLI( 'DELETING records with where = ' . $where,  'dark_gray' ) ;
@@ -3780,7 +3818,7 @@ echo "\n RandomText mit [ $min_len .. $max_len ]";
 
 	} elseif ( $token_next == 'INCREMENT' ) {
 
-# increment 'ID_ADDRESS' depending from 'ID_MANDANT, ID_BUCHUNGSKREIS'
+		# increment 'ID_ADDRESS' depending from 'ID_MANDANT, ID_BUCHUNGSKREIS'
 
 		// Inkrement-Spezifizierer wurde angegeben
 
@@ -3808,10 +3846,8 @@ echo "\n RandomText mit [ $min_len .. $max_len ]";
 
 		    $this->SkipSpaces( );
 
-		    if ( strtoupper ( $this->NextToken( ) ) != 'ON' ) {
-			echo "\n {$this->m_command} ";
-			die( "\n INCREMENT DEPENDING without ON" );
-		    }
+
+		    $this->DieIf( strtoupper ( $this->NextToken( ) ) != 'ON', "program crashed: INCREMENT DEPENDING without ON" );
 
 		    // 'DEPENDING' überspringen
 
@@ -3876,18 +3912,17 @@ echo "\n RandomText mit [ $min_len .. $max_len ]";
 	    $token = $this->ScanToken( );
 
 	    // wenn ein using folgt, dann haben wir alle Felder eingelesen
-	    if ( strtoupper( $token ) != 'USING' ) die("\n USING erwartet, aber '{$token}' erhalten");
+	    $this->DieIf( strtoupper( $token ) != 'USING' , "Program crashed: USING erwartet, aber '{$token}' erhalten");
 
 	    // read the sql-command
 	    $this->SkipSpaces( );
 
 	    $this->GetTextBetweenDelimiters( $str_sql );
 
-	    if ( is_null( $this->m_mysqli ) ) die( "\n Abbruch: ohne DB_PARAMS ist FETCH nicht möglich" );
+	    $this->DieIf( is_null( $this->m_mysqli ) ,  "Abbruch: ohne DB_PARAMS ist FETCH nicht möglich"  );
 
 	    // eventuell noch Feldvariablen ersetzen?
-echo "\n fetch with $str_sql";
-echo "\n replacing field vars";
+
 	    foreach ( $this->m_a_fetched as $fetched ) {
 
 		$fetched->ReplaceFieldVars( $str_sql );
@@ -3917,21 +3952,13 @@ echo "\n replacing field vars";
 
 	    $token = $this->ScanToken( );
 
-	    if ( strtoupper( $token ) != 'KEY' ) {
-
-		die ( "\n Program crashed: PRIMARY without 'KEY'" );
-
-	    }
+	    $this->DieIf( strtoupper( $token ) != 'KEY',  "Program crashed: PRIMARY without 'KEY'" );
 
 	    $this->SkipSpaces( );
 
 	    $token = $this->ScanToken( );
 
-	    if ( strtoupper( $token ) != 'IS' ) {
-
-		die ( "\n Program crashed: PRIMARY KEY without 'IS'" );
-
-	    }
+	    $this->DieIf( strtoupper( $token ) != 'IS', "Program crashed: PRIMARY KEY without 'IS'" );
 
 	    // Parameter einlesen
 
@@ -3952,7 +3979,7 @@ echo "\n replacing field vars";
 
 	    $this->m_a_primary_keys = $a_pk;
 
-	    echo "\n PRIMARY KEY IS " ; var_dump( $this->m_a_primary_keys );
+	    // echo "\n PRIMARY KEY IS " ; var_dump( $this->m_a_primary_keys );
 
 	    // assert there follows a semicolon
 	    $this->AssertFollowingSemicolon( );
@@ -3971,7 +3998,7 @@ echo "\n replacing field vars";
 ;
 //	    $ch = $this->GetCh( );
 
-	    if ( $this->m_chr != '=' ) die ( "\n Abbruch: Fehler in dbparams: '=' erwartet anstatt von '{$ch}' " );
+	    $this->DieIf( $this->m_chr != '=',  "Abbruch: Fehler in dbparams: '=' erwartet anstatt von '{$ch}' " );
 
 	    // überspringe '='
   	    $this->GetCh( );
@@ -3988,13 +4015,11 @@ echo "\n replacing field vars";
 
 	    // calculate the database provider, which leads the DNS
 
-	    if ( $this->m_is_dbo_active ) {
+	    if ( $this->m_is_pdo_active ) {
 
 		$pos_colon = strpos( $params, ':' );
 
-		if ( $pos_colon === false ) {
-		    die ( "\n Program crashed: DBO DSN without database provider ( '$params' )" );
-		}
+		$this->DieIf( $pos_colon === false, "Program crashed: DBO DSN without database provider ( '$params' )" );
 
 		$this->m_database_provider = strtoupper( trim( substr( $params, 0, $pos_colon ) ) );
 
@@ -4011,7 +4036,7 @@ echo "\n replacing field vars";
 	    // ask the user for missing credentials
 
 	    echo "\n trying to connect to '{$this->m_database_provider}';";
-	    $this->m_obj_command_database_params = new cCommandDatabaseParams( $params, $this->m_database_provider, $this->m_is_dbo_active );
+	    $this->m_obj_command_database_params = new cCommandDatabaseParams( $params, $this->m_database_provider, $this->m_is_pdo_active );
 	    $this->m_mysqli = $this->m_obj_command_database_params->GetOpenedDatabase( );
 
 	    // assert there follows a semicolon
@@ -4026,16 +4051,12 @@ echo "\n replacing field vars";
 	    $this->SkipSpaces( );
 	    $token = strtoupper( $this->ScanToken( ) );
 
-	    if  ( $token != 'CLAUSE' )  {
-		die ( "\n Program crashed: DO without DELETE" );
-	    }
+	    $this->DieIf( $token != 'CLAUSE', "\n Program crashed: DO without DELETE" );
 
 	    $this->SkipSpaces( );
 	    $token = strtoupper( $this->ScanToken( ) );
 
-	    if  ( $token != 'FOR' )  {
-		die ( "\n Program crashed: DO without DELETE" );
-	    }
+	    $this->DieIf( $token != 'FOR', "Program crashed: DO without DELETE" );
 
 	    $this->SkipSpaces( );
 
@@ -4047,17 +4068,12 @@ echo "\n replacing field vars";
 
 	    $table_name = $token;
 
-	    if  ( $table_name == '' )  {
-		die ( "\n Program crashed: DO DELETE with empty tablename" );
-	    }
+	    $this->DieIf( $table_name == '', "Program crashed: DO DELETE with empty tablename" );
 
 	    $this->SkipSpaces( );
 	    $token = strtoupper( $this->ScanToken( ) );
 
-	    if  ( $token != 'IS' )  {
-		die ( "\n Program crashed: DO DELETE without IS" );
-	    }
-
+	    $this->DieIf( $token != 'IS', "Program crashed: DO DELETE without IS" );
 
 	    $this->SkipSpaces( );
 
@@ -4088,16 +4104,12 @@ echo "\n replacing field vars";
 	    $this->SkipSpaces( );
 	    $token = strtoupper( $this->ScanToken( ) );
 
-	    if ( $token != 'ON' ) {
-		die ( "\n Program crashed: WORK without ON detected" );
-	    }
+	    $this->DieIf ( $token != 'ON', "Program crashed: WORK without ON detected" );
 
 	    $this->SkipSpaces( );
 	    $token = strtoupper( $this->ScanToken( ) );
 
-	    if ( $token != 'TABLE' ) {
-		die ( "\n Program crashed: WORK ON without TABLE detected" );
-	    }
+	    $this->DieIf ( $token != 'TABLE', "Program crashed: WORK ON without TABLE detected" );
 
 	    $this->SkipSpaces( );
 
@@ -4107,9 +4119,7 @@ echo "\n replacing field vars";
 		$token = $this->ScanToken( );
 	    }
 
-	    if ( $token === '' ) {
-		die ( "\n Program crashed: WORK ON TABLE without table" );
-	    }
+	    $this->DieIf( $token === '', "Program crashed: WORK ON TABLE without table" );
 
 	    $this->m_act_table = $token;
 	    echo "\n". $this->m_obj_colors->ColoredCLI( 'Working on ' . $token,  'dark_gray' ) ;
@@ -4129,23 +4139,17 @@ echo "\n replacing field vars";
 
 		$token = strtoupper( $this->ScanToken( ) );
 
-		if ( $token != 'WITH' ) {
-		    die ( "\n Program crashed: START without WITH detected" );
-		}
+		$this->DieIf( $token != 'WITH', "Program crashed: START without WITH" );
 
 		$this->SkipSpaces( );
 		$token = strtoupper( $this->ScanToken( ) );
 
-		if ( $token != 'RECORD' ) {
-		    die ( "\n Program crashed: START WITH without RECORD detected" );
-		}
+		$this->DieIf( $token != 'RECORD', "Program crashed: START WITH without RECORD" );
 
 		$this->SkipSpaces( );
 		$token = $this->ScanNumber( );
 
-		if ( $token === '' ) {
-		    die ( "\n Program crashed: START WITH RECORD without record number" );
-		}
+		$this->DieIf( $token === '', "Program crashed: START WITH RECORD without record number" );
 
 		$this->m_act_record_number = $token;
 		echo "\n". $this->m_obj_colors->ColoredCLI( 'Starting with record ' . $token,  'dark_gray' ) ;
@@ -4169,18 +4173,14 @@ echo "\n replacing field vars";
 	    $this->SkipSpaces( );
 	    $token = $this->ScanNumber( );
 
-	    if ( $token === '' ) {
-		die ( "\n Program crashed: EXPORT without record count" );
-	    }
+	    $this->DieIf( $token === '', "Program crashed: EXPORT without record count" );
 
 	    $this->m_records_to_export = $token;
 
 	    $this->SkipSpaces( );
 	    $token = $this->ScanToken( );
 
-	    if ( $token === '' ) {
-		die ( "\n Program crashed: EXPORT without RECORDS" );
-	    }
+	    $this->DieIf( $token === '', "Program crashed: EXPORT without RECORDS" );
 
 	    echo "\n". $this->m_obj_colors->ColoredCLI( 'Exporting ' . $this->m_records_to_export . ' records ',  'dark_gray' ) ;
 
@@ -4196,15 +4196,11 @@ echo "\n replacing field vars";
 	    $this->SkipSpaces( );
 	    $token = strtoupper( $this->ScanToken( ) );
 
-	    if  ( $token != 'TEXT' )  {
-		die ( "\n Program crashed: INCLUDE without TEXT" );
-	    }
+	    $this->DieIf( $token != 'TEXT', "Program crashed: INCLUDE without TEXT" );
 
 	    $this->SkipSpaces( );
 
-	    if  ( $this->m_chr != '=' )  {
-		die ( "\n Program crashed: INCLUDE TEXT without '=' " );
-	    }
+	    $this->DieIf( $this->m_chr != '=', "Program crashed: INCLUDE TEXT without '='" );
 	    $this->GetCh( );
 /*
 	    $this->SkipSpaces( );
@@ -4257,26 +4253,10 @@ echo "\n replacing field vars";
 	    $this->SkipSpaces( );
 	    $token = strtoupper( $this->ScanToken( ) );
 
-	    if ( $token != 'FROM' ) {
-		die ( "\n Program crashed: READ without FROM detected" );
-	    }
 
+	    $this->DieIf( $token != 'FROM', "Program crashed: READ without FROM detected" );
 
 	    $this->SkipSpaces( );
-
-/*
-	    if ( $this->m_chr !== '"' ) {
-		die ( "\n Program crashed: READ without Filename" );
-	    }
-
- 	    $this->GetCh( );
-	    $token = trim( $this->ScanUntilFolgezeichen( '"' ) );
-
-	    if ( $token === '' ) {
-		die ( "\n Program crashed: READ with empty filename" );
-	    }
-
-*/
 
 	    $this->GetTextBetweenDelimiters( $token );
 
@@ -4302,18 +4282,14 @@ echo "\n replacing field vars";
 		$token = $this->ScanToken( );
 	    }
 
-	    if ( $token == '' ) {
-		die ( "\n Program crashed: USE without column name" );
-	    }
+	    $this->DieIf( $token === '', "Program crashed: USE without column name" );
 
 	    $field_name = $token;
 
 	    $this->SkipSpaces( );
 	    $token = strtoupper( $this->ScanToken( ) );
 
-	    if ( $token != 'AS' ) {
-		die ( "\n Program crashed: USE without AS" );
-	    }
+	    $this->DieIf( $token != 'AS', "Program crashed: USE without AS" );
 
 	    $this->SkipSpaces( );
 	    $token = strtoupper( $this->ScanToken( ) );
@@ -4346,18 +4322,14 @@ echo "\n replacing field vars";
 		$token = $this->ScanToken( );
 	    }
 
-	    if ( $token == '' ) {
-		die ( "\n Program crashed: SET without column name" );
-	    }
+	    $this->DieIf( $token === '', "Program crashed: SET without column name" );
 
 	    $field_name = $token;
 
 	    $this->SkipSpaces( );
 	    $token = strtoupper( $this->ScanToken( ) );
 
-	    if ( $token != 'TO' ) {
-		die ( "\n Program crashed: SET without TO ( got {$token} ) in \n $this->m_command" );
-	    }
+	    $this->DieIf( $token != 'TO', "Program crashed: SET without TO" );
 
 	    $this->SkipSpaces( );
 	    // $token = strtoupper( $this->ScanToken( ) );
@@ -4396,24 +4368,14 @@ echo "\n replacing field vars";
 		$this->SkipSpaces( );
 		$token = strtoupper( $this->ScanToken( ) );
 
-/*
-		if ( $token != 'RANDOMIZED' ) {
-		    die ( "\n Program crashed: set column name to without RANDOMIZED" );
-		}
-*/
-
-		if ( ! $this->StringFoundIn( $token, 'RANDOMIZED', 'SQL' ) ) {
-		    die ( "\n Program crashed: set column name : RANDOMIZED or SQL expected, but received '$token'" );
-		}
+		$this->DieIf( ! $this->StringFoundIn( $token, 'RANDOMIZED', 'SQL' ), "Program crashed: set column name : RANDOMIZED or SQL expected, but received '$token'" );
 
 		if ( $token == 'RANDOMIZED' ) {
 
 		    $this->SkipSpaces( );
 		    $token = strtoupper( $this->ScanToken( ) );
 
-		    if ( ! $this->StringFoundIn( $token, 'DATE', 'TIME', 'DATETIME', 'PHONE', 'BLZ', 'BIC', 'IBAN', 'FLOAT', 'INT', 'BOOLEAN', 'CHAR' ) ) {
-			die ( "\n Program crashed: set column name to with unknown data type '$token'" );
-		    }
+		    $this->DieIf( ! $this->StringFoundIn( $token, 'DATE', 'TIME', 'DATETIME', 'PHONE', 'BLZ', 'BIC', 'IBAN', 'FLOAT', 'INT', 'BOOLEAN', 'CHAR' ), "Program crashed: set column name to with unknown data type '$token'" );
 
 		    $data_type = $token;
 
@@ -4428,9 +4390,7 @@ echo "\n replacing field vars";
 
 			$token = strtoupper( $this->ScanToken( ) );
 
-			if ( ! $this->StringFoundIn( $token, 'PAST', 'FUTURE' ) ) {
-			    die ( "\n Program crashed: only PAST or FUTURE is allowed here" );
-			}
+			$this->DieIf( ! $this->StringFoundIn( $token, 'PAST', 'FUTURE' ), "Program crashed: only PAST or FUTURE is allowed here" );
 
 			$param2 = $token;
 
@@ -4450,13 +4410,10 @@ echo "\n replacing field vars";
 			$this->SkipSpaces( );
 			$token = strtoupper( $this->ScanToken( ) );
 
-			if ( $token != 'AND' ) {
-			    die ( "\n Program crashed: BETWEEN without AND" );
-			}
+			$this->DieIf( $token != 'AND', "Program crashed: BETWEEN without AND" );
 
 			$this->SkipSpaces( );
 			$token = strtoupper( $this->ScanNumber( ) );
-
 
 			$param3 = $token;
 
@@ -4527,16 +4484,12 @@ Array
 	    $this->SkipSpaces( );
 	    $token = strtoupper( $this->ScanToken( ) );
 
-	    if ( $token != 'THE' ) {
-		die ( "\n Program crashed: RUN without THE" );
-	    }
+	    $this->DieIf( $token != 'THE', "Program crashed: RUN without THE" );
 
 	    $this->SkipSpaces( );
 	    $token = strtoupper( $this->ScanToken( ) );
 
-	    if ( $token != 'EXPORT' ) {
-		die ( "\n Program crashed: RUN without EXPORT" );
-	    }
+	    $this->DieIf( $token != 'EXPORT', "Program crashed: RUN without EXPORT" );
 
 	    // assert there follows a semicolon
 	    $this->AssertFollowingSemicolon( );
@@ -4553,31 +4506,12 @@ Array
 	    $this->SkipSpaces( );
 	    $token = strtoupper( $this->ScanToken( ) );
 
-	    if ( $token != 'IS' ) {
-		die ( "\n Program crashed: FILENAME without IS" );
-	    }
+	    $this->DieIf( $token != 'IS', "Program crashed: FILENAME without IS" );
 
 	    $this->SkipSpaces( );
 
-/*
-	    // $token = strtoupper( $this->ScanToken( ) );
-	    if ( $this->m_chr == '"' ) {
-
-		$this->GetCh();
-		$token = $this->ScanUntilFolgezeichen( '"' );
-		$this->GetCh( );
-
-	    } else {
-
-		die ( "\n Program crashed: FILENAME without string constant? " );
-
-	    }
-*/
-
 	    $this->GetTextBetweenDelimiters( $token );
 	    // leere Zeichenketten sind erlaubt
-
-// 	    if ( is_resource( $this->m_filehandle_export ) ) fclose( $this->m_filehandle_export );
 
 	    $this->CloseExportFile( );
 
@@ -4598,9 +4532,7 @@ Array
 	    $this->SkipSpaces( );
 	    $token = strtoupper( $this->ScanToken( ) );
 
-	    if ( ( $token != 'DATA' ) && ( $token != 'ACTIONS' ) && ( $token != 'CODE' ) ) {
-		die ( "\n Program crashed: RESET what?" );
-	    }
+	    $this->DieIf( ( ( $token != 'DATA' ) && ( $token != 'ACTIONS' ) && ( $token != 'CODE' ) ), "Program crashed: RESET what?" );
 
 	    if ( $token == 'DATA' ) {
 		$this->ResetData( );
@@ -4618,7 +4550,8 @@ Array
 
 	} else {
 
-	    die( "\n Program crashed: Unknown command '{$token_next}' in '$this->m_command'" );
+
+	    $this->DieIf( true, "Program crashed: Unknown command '{$token_next}' in '$this->m_command'" );
 
 	}
 
@@ -4638,7 +4571,7 @@ Array
     }   // function MakePath( )
 
 
-}	// class cCommand
+}	// class cCommandInterpreter
 
 
 
@@ -4676,13 +4609,13 @@ class cTestdatenGenerator {
       echo "\n Memory Peak (malloc) : " . number_format( memory_get_peak_usage ( false) / 1024 / 1024, 3 , ',', '.' ) . ' MB ';
       echo "\n Time:  " . number_format( ( microtime(true) - $this->m_start_time ), 4) . " Seconds\n";
 
-      echo"\n finished";
+      echo "\n". $this->m_obj_colors->ColoredCLI( "finished", 'green' ) ;
 
   }
 
   public function Execute( ) {
 
-      $this->m_obj_command = new cCommand( );
+      $this->m_obj_command = new cCommandInterpreter( );
 
       while ( ( $cmd = $this->m_obj_config->ReadCommand( ) ) != '' ) {
 
@@ -4732,20 +4665,21 @@ class cTestdatenGenerator {
 
 }	// class cTestdatenGenerator
 
-$opts = getopt( 'c:', array('cfg:') );
+$opts = getopt( 'c:', array('config:') );
 // echo "\n opts = "; var_dump( $opts );
 
 if ( ( $opts === false ) || ( count( $opts ) == 0 ) ) {
     echo("\n Abbruch: Erwarte Parameter mit Konfigurationsdatei");
-    echo("\n mk-test-data.php --cfg <configfile>\n");
+    echo("\n mk-test-data.php --config <configfile>\n");
 } else {
      try {
-	$obj = new cTestdatenGenerator( $opts['cfg'] ) ;
+	$obj = new cTestdatenGenerator( $opts['config'] ) ;
 	$obj->Execute( );
      } catch( Exception $e ) {
  	echo 'Exception abgefangen: ',  $e->getMessage(), "\n";
      }
 }
+
 
 
 ?>

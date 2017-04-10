@@ -1,0 +1,6 @@
+git add ./mk-sql-data.php
+git add ./README.md
+git add ./git-add.sh ./mk-sql-data.sh ./phpxref-mk-sql-data.sh
+git add data/de-prenames.txt data/de-streets.txt data/de-surnames.txt data/de-text.txt data/de-zips.txt data/es-prenames.txt data/es-streets.txt data/es-surnames.txt data/es-text.txt data/es-zips.txt data/fr-prenames.txt data/fr-streets.txt data/fr-surnames.txt data/fr-text.txt data/fr-zips.txt data/us-prenames.txt data/us-streets.txt data/us-surnames.txt data/us-text.txt data/us-zips.txt
+git add examples/ifx_access.sql examples/mk-sql-data-init-db2.sql examples/mk-sql-data-init-informix.sql examples/mk-sql-data-init-mysql.sql examples/mk-sql-data-init-oracle.sql examples/mk-sql-data-init-postgres.sql
+git add examples/mk-sql-data-00.cmd examples/mk-sql-data-01.cmd examples/mk-sql-data-02-db2.cmd examples/mk-sql-data-02-dbo-informix.cmd examples/mk-sql-data-02-dbo-oracle.cmd examples/mk-sql-data-02-mysql.cmd examples/mk-sql-data-02-oracle.cmd examples/mk-sql-data-02-pdo-db2.cmd examples/mk-sql-data-02-pdo-informix.cmd examples/mk-sql-data-02-pdo-mysql.cmd examples/mk-sql-data-02-pdo-oracle.cmd examples/mk-sql-data-02-pdo-pgsql.cmd examples/mk-sql-data-02-pgsql.cmd examples/mk-sql-data-03-mysql.cmd examples/mk-sql-data-03-oracle.cmd

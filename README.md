@@ -56,7 +56,7 @@ mk-sql-data runs out of the box. You can use the sample
 script mk-sql-data-00.cmd as starting point in order to
 run a test with the command
 
-    mk-sql-data.php --cfg mk-sql-data-00.cmd
+    mk-sql-data.php --config mk-sql-data-00.cmd
 
 mk-sql-data runs for me on a Linux-machine with PHP 5,
 but it should run on other platforms, too. Please do
@@ -84,7 +84,7 @@ Thank you for reading and using this part of software!
 
 Greets,
 
-Rainer Stötter, Altenburg, Germany
+Rainer Stötter
 
 #########################################################
 #               Deutsche Zusammenfassung                #
@@ -148,7 +148,7 @@ mk-sql-data läuft ohne weiteren Einstellungen gleich
 nach dem Auspacken. Sie können also das Programm sofort
 testen mit dem Befehl
 
-    mk-sql-data.php --cfg mk-sql-data-00.cmd
+    mk-sql-data.php --config mk-sql-data-00.cmd
 
 mk-sql-data läuft bei mir in einer Linux-Umgebung mit
 installiertem PHP 5, sollte jedoch auch auf anderen
@@ -180,4 +180,4 @@ haben und dafür, dass Sie diese Software nutzen möchten!
 
 Herzliche Grüße
 
-Rainer Stötter, Altenburg, Deutschland
+Rainer Stötter
