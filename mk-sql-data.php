@@ -193,6 +193,228 @@ cTestdatenGenerator:: (4 methods):
 
   */
 
+
+class cMicrosoftResultSmall {
+
+    // a basic subset of the ibm db2 operations hidden behind a class
+
+    const RESULT_BOTH = MYSQLI_BOTH;
+    const RESULT_ASSOC = MYSQLI_ASSOC;
+    const RESULT_NUM = MYSQLI_NUM;
+
+    protected $m_id_statement = null;
+
+    public $num_rows = -1;
+
+    function __construct( $id_statement ) {
+
+	assert( $id_statement !== false );
+
+	$this->m_id_statement = $id_statement;
+
+	 $this->num_rows = mssql_num_rows( $this->m_id_statement );
+
+    }	// function __destruct( )
+
+    function __destruct( ) {
+
+	$this->close( );
+
+    }	// function __destruct( )
+
+    public function fetch_array( $resulttype = self::RESULT_BOTH ){
+
+	// Fetch a result row as an associative, a numeric array, or both
+
+        if ( $resulttype == self::RESULT_ASSOC ) {
+
+	    return $this->fetch_assoc( );
+
+        } elseif ( $resulttype == self::RESULT_NUM ) {
+
+	    return $this->mssql_fetch_row( $this->m_id_statement );
+
+        }
+
+        // self::RESULT_BOTH
+
+        $ary = $this->fetch_assoc( );
+
+        $keys = array_keys( $ary );
+        $values = array_values( $ary );
+
+        for( $i = 0; $i < count( $keys ); $i++ ) {
+
+	    $ary[ $keys[ $i ] ] = $values[ $i ];
+
+        }
+
+        return $ary;
+
+    }
+
+    public function fetch_row( ){
+
+	// Get a result row as an enumerated array
+
+        return mssql_fetch_row( $this->m_id_statement );
+    }
+
+    public function fetch_assoc( ){
+
+
+        return mssql_fetch_assoc( $this->m_id_statement );
+
+    }
+
+    public function close( ) {
+
+	// nop - no operation
+
+	if ( is_resource( $this->m_id_statement ) ) {
+
+	    mssql_free_result ( $this->m_id_statement );
+
+	    $this->m_id_statement = null;
+
+	}
+
+    }  // function close( )
+
+}	// class cMicrosoftResultSmall
+
+
+class cMicrosoftSmall {
+
+    // a basic subset of the db2 operations hidden behind a class
+
+    // TODO: cursor_type berücksichtigen!
+
+    protected $m_connection_handle = null;
+
+    protected $m_fetch_mode = cInformixResultSmall::RESULT_BOTH;
+
+    protected $m_last_query = '';
+
+/*
+    private function Execute( $sql ){
+
+	static $counter = 0;
+
+
+	assert( is_resource( $this->m_connection_handle ) );
+
+        if ( ! is_resource( $this->m_connection_handle ) ) {
+	    return false;
+	}
+
+        $this->m_last_query = $sql;
+
+	$prep_result = mssql_prepare( $this->m_connection_handle, "my_query_" . $counter, $sql );
+
+	$id_statement = pg_execute( $this->m_connection_handle, "my_query_" . $counter, array( ) );
+
+        // $id_statement = db2_exec( $this->m_connection_handle, $sql, array( 'cursor' => DB2_SCROLLABLE )  );
+
+	if (! $id_statement ) {
+	  assert( false == true );
+	  debug_print_backtrace( );
+	  echo "\n error executing sql: '{$sql}'";
+	  exit;
+	}
+
+        $result = $id_statement;
+
+        $counter++;
+
+        return $result;	// false when not successful
+    }
+*/
+
+    protected function Connect( $connection_string = '', $user = '', $password = '', $schema ){
+
+	// connection_string ist database!
+
+/*
+
+// connection_string ist Server in diesem Format: <computer>\<instance name> oder
+// <server>,<port>, falls nicht der Standardport verwendet wird
+
+*/
+
+	$connection_string = strtoupper( str_replace( ' ', '', $connection_string ) );
+
+	$this->m_connection_handle = mssql_connect ( $connection_string, $user, $password );
+
+	if ( $this->m_connection_handle === false ) {
+ 	    echo "\n" . $this->GetErrorMessage( );
+	    die( "\n error connecting to '{$connection_string}' with user '{$user}'" );
+	}
+
+	$this->query( "use " . $schema );
+
+
+      return $this->m_connection_handle;	// FALSE oder handle
+    }
+
+
+
+    public function query( $sql ){
+
+        $id_statement = mssql_query( $sql, $this->m_connection_handle );
+
+        return  ( $id_statement !== false ?  new cMicrosoftResultSmall( $id_statement ) : false );
+
+    }
+
+    public function close( ) {
+
+	if ( $this->m_connection_handle !== false ) {
+
+	    mssql_close( $this->m_connection_handle );
+
+	    $this->m_connection_handle = false;
+
+	  }
+
+    }
+
+   public function GetError(){
+        return @mssql_get_last_message( );
+    }
+
+   public function GetErrorMessage(){
+        return @mssql_get_last_message( );
+    }
+
+
+    public function __construct(
+			  $host = '',
+			  $user = '',
+			  $password = '',
+			  $database = ''
+			  ) {
+
+	// in $this->m_connection_handle ist der Handle des Datenbank-Connects gespeichert
+
+
+	$database = trim( $database );
+
+        $this->Connect( $host, $user, $password );
+
+    }
+
+    function __destruct( ) {
+
+	$this->close( );
+
+    }	// function __destruct( )
+
+}  // class cMicrosoftSmall
+
+
+
+
 class cPostgreResultSmall {
 
     // a basic subset of the ibm db2 operations hidden behind a class
@@ -865,9 +1087,10 @@ class cPdoSmall {
 	    // PHP Fatal Error. Second Argument Has To Be An Integer, But PDOException::getCode Returns A
 	    // String.
 
-	  echo "\n available drivers:";
-	  foreach( PDO::getAvailableDrivers( ) as $driver)
+	  echo "\n available PDO drivers:";
+	  foreach( PDO::getAvailableDrivers( ) as $driver) {
 	      echo $driver, "\n";
+	  }
 
 	    echo $this->GetError( );
 	    echo "\n PDO error: " .  $Exception->getMessage( );
@@ -883,11 +1106,11 @@ class cPdoSmall {
     }
 
    public function GetError(){
-        return $this->m_pdo->errorCode( );
+        return $this->m_pdo->errorCode;
     }
 
    public function GetErrorMessage(){
-        return $this->m_pdo->errorInfo( );
+        return $this->m_pdo->errorInfo;
     }
 
 
@@ -909,13 +1132,22 @@ echo "\n new cPdoSmall with dsn = '$host'";
     catch( PDOException $Exception ) {
 	// PHP Fatal Error. Second Argument Has To Be An Integer, But PDOException::getCode Returns A
 	// String.
-	  echo "\n available drivers:";
-	  foreach( PDO::getAvailableDrivers( ) as $driver)
-	      echo $driver, "\n";
+	try {
+	  echo "\n available PDO drivers when constructing:";
+	  foreach( PDO::getAvailableDrivers( ) as $driver) {
+	      echo "\n $driver";
+	  }
 
-	    echo $this->GetError( );
+
 	    echo "\n PDO error: " .  $Exception->getMessage( );
+	    echo "\n error =" . $this->GetError( );
 	    die( "\n" );
+	}
+	catch ( PDOException $Exception ) {
+
+	    die( "\n unrecoverable error condition" );
+
+	}
 
     }
 // echo "\n cPdoSmall created";
@@ -1822,14 +2054,59 @@ class cCommandDatabaseParams {
 
 	$str_params = trim( $str_params );
 
-	$a_params = explode( ',' , $str_params );
+	// stimmt nicht! Um Ports zu benennen, darf im DSN auch ein Komma auftauchen!
+	// $a_params = explode( ',' , $str_params );
+
+	$a_params = array( );
+
+	$params = $str_params;
+	$pos_r = strlen( $params );
+	$pos_l = strrpos( $params, ',' );
+	if ( $pos_l > 0 ) {
+
+	    $this->m_user_password = substr( $params, $pos_l +1 , $pos_r - $pos_l );
+
+	    $params = substr( $params, 0, $pos_l   );
+
+	    $pos_r = strlen( $params );
+	    $pos_l = strrpos( $params, ',' );
+	    if ( $pos_l > 0 ) {
+
+		$this->m_user_name = substr( $params, $pos_l + 1 , $pos_r - $pos_l );
+
+		$params = substr( $params, 0, $pos_l   );
+
+		$pos_r = strlen( $params );
+		$pos_l = strrpos( $params, ',' );
+		if ( $pos_l > 0 ) {
+
+		    $this->m_schema_name = substr( $params, $pos_l + 1 , $pos_r - $pos_l );
+
+		    $params = substr( $params, 0, $pos_l   );
+
+		    $this->m_host_name = $params;
+
+
+		}
+
+
+	    }
+
+
+	}
+
+	//
+
 
 // var_dump( $a_params );
+/*
+	$this->m_host_name = trim( $a_params[ 0 ] );
+	$this->m_schema_name = trim( $a_params[ 1 ] );
+	$this->m_user_name = trim( $a_params[ 2 ] );
+	$this->m_user_password = trim( $a_params[ 3 ] );
+*/
 
-	$this->m_host_name = $a_params[ 0 ];
-	$this->m_schema_name = $a_params[ 1 ];
-	$this->m_user_name = $a_params[ 2 ];
-	$this->m_user_password = $a_params[ 3 ];
+
 	$this->m_is_pdo_active = $is_dbo_active;
 
 	$this->m_database_provider = strtoupper( trim( $database_provider ) );
@@ -1921,6 +2198,19 @@ class cCommandDatabaseParams {
 		    $obj_credentials->m_user_password,
 		    $obj_credentials->m_schema_name
 		);
+
+	    } elseif ( $this->m_database_provider == 'MICROSOFT' ) {
+
+		echo "\n connecting to MICROSOFT SQL via PDO";
+
+		$mysqli = new cMicrosoftSmall(
+		    $obj_credentials->m_host_name,
+		    $obj_credentials->m_user_name,
+		    $obj_credentials->m_user_password,
+		    $obj_credentials->m_schema_name
+		);
+
+		$mysqli->query( 'use ' . $obj_credentials->m_schema_name );
 
 	    } else {
 
@@ -2054,12 +2344,14 @@ class cCommandIncrement {
 
 	}
 
-	if ( $this->m_database_provider == 'ORACLE' || $this->m_database_provider == 'INFORMIX' ) {
+	if ( $this->m_database_provider == 'ORACLE' || $this->m_database_provider == 'INFORMIX'   )  {
 	    // $str_value = "( SELECT CASE WHEN ISNULL( MAX( {$str_field_name} ) ) THEN 1 ELSE MAX( {$str_field_name} ) + 1 ) FROM {$table_name} XXX {$where} )";
 	    $str_value = "( SELECT NVL( MAX( {$str_field_name} ), 0 ) + 1 FROM {$table_name} XXX {$where} )";
+	} elseif ( ( $this->m_database_provider == 'MICROSOFT' ) )  {
+	    $str_value = "( SELECT ISNULL( MAX( {$str_field_name} ), 0 ) + 1 FROM {$table_name} XXX {$where} )";
 	} elseif ( ( $this->m_database_provider == 'IBM' ) || ( $this->m_database_provider == 'PGSQL' ) ) { // seems to have no alias
 	    $str_value = "( SELECT COALESCE( MAX( {$str_field_name} ), 0 ) + 1 FROM {$table_name} AS X___XXX___ {$where} )";
-	} else {
+	}  else {
 	    $str_value = "( SELECT IF( ISNULL( MAX( {$str_field_name} ) ), 1, MAX( {$str_field_name} ) + 1 ) FROM {$table_name} AS _XXX_ {$where} )";
 	}
 
@@ -2132,8 +2424,8 @@ class cCommandFetch {
 	$result = $this->m_mysqli->query( $this->m_sql );
 
 	if ( $result === false ) {
-	    printf("\nFetchData: \n Errormessage: %s \n SQL: %s", $this->m_mysqli->error, $this->m_sql );
-	    $msg = " Abbruch wegen Datenbankfehler" ;
+	    printf("\nFetchData: \n Errormessage: %s \n SQL: %s", $this->m_mysqli->GetErrorMessage( ), $this->m_sql );
+	    $msg = " Abbruch wegen Datenbankfehler : " ;
 	    $this->DieIf( $result === false, $msg );
 	}
 
@@ -2184,6 +2476,9 @@ class cCommandFetch {
 	    echo "\n values: " . count( $values ) . ' and names: ' . count( $field_names );
 	    echo "\n values: " ; var_dump( $values ) ;
 	    echo "\n and names: " ; var_dump( $field_names );
+	    echo "\n sql = {$this->m_sql}";
+
+	    echo "\n Aborting: Fetched field does contain no data!";
 
 	    $this->dieif( true, "program crashed: sql returns no rows! \n sql was: {$this->m_sql}" );
 
@@ -2329,6 +2624,8 @@ class cCommandInterpreter {
     protected $m_obj_command_database_params = null;
 
     protected $m_a_primary_keys = array( );	// primary key fields
+
+    protected $m_schema_name = '';		// the schema to use
 
 /*
     // the database credentials
@@ -2506,7 +2803,9 @@ class cCommandInterpreter {
 
 	if ( ! $_started_transaction ) {
 
-	    if ( $this->m_database_provider == 'INFORMIX' ) {
+	    if ( $this->m_database_provider == 'MICROSOFT' ) {
+		$this->m_sql_code .= chr( 10 ) . 'BEGIN TRANSACTION;' . chr( 10 );
+	    } elseif ( $this->m_database_provider == 'INFORMIX' ) {
 		$this->m_sql_code .= chr( 10 ) . 'BEGIN WORK;' . chr( 10 );
 	    } elseif ( $this->m_database_provider == 'IBM' ) {
 		$this->m_sql_code .= chr( 10 ) . 'UPDATE COMMAND OPTIONS USING c OFF;' . chr( 10 );
@@ -2523,14 +2822,23 @@ class cCommandInterpreter {
 
 // 	$begin .= 'BEGIN;' . chr(10);
 
-	if ( ( $this->m_database_provider == 'INFORMIX' ) || ( $this->m_database_provider == 'IBM' ) ) {
+	if ( ( $this->m_database_provider == 'MICROSOFT' ) ) {
+	    $commit = 'COMMIT TRANSACTION;' . chr(10);
+	} elseif ( ( $this->m_database_provider == 'INFORMIX' ) || ( $this->m_database_provider == 'IBM' ) ) {
 	    $commit = 'COMMIT WORK;' . chr(10);
 	} else {
 	    $commit = 'COMMIT;' . chr(10);
 	}
 
+	$schema_user = ( strlen( $this->m_schema_name ) ? $this->m_schema_name . '.' : '' );
 
-	$prefix = chr(10) . 'INSERT INTO ' . $this->m_act_table . '(';
+	if ( ( $this->m_database_provider == 'MICROSOFT' ) && ( ! strlen( $this->m_schema_name ) ) ) {
+
+	    die("\n ABbruch: kein Schema bei DATABASE PROVIDER IS MICROSOFT!");
+
+	}
+
+	$prefix = chr(10) . "INSERT INTO {$schema_user}{$this->m_act_table}( " ;
 	$middle = ' ) VALUES ( ';
 
 	// Semikolon am Ende, auch wenn DB2!
@@ -3714,7 +4022,32 @@ class cCommandInterpreter {
 
 	$token_next = strtoupper( $this->NextToken( ) );
 
-	if ( $token_next == 'PDO' ) {
+	if ( $token_next == 'SCHEMA' ) {
+
+	    $this->SkipSpaces( );
+	    $token = $this->ScanToken( );
+
+	    $this->SkipSpaces( );
+	    $token = strtoupper( $this->ScanToken( ) );
+
+	    $this->DieIf( $token != 'IS', "Program crashed: SCHEMA without IS detected" );
+
+	    $this->SkipSpaces( );
+	    // $token = $this->ScanToken( );
+	    $this->GetTextBetweenDelimiters( $token );
+
+	    // $this->DieIf( $token != '', "\n Program crashed: No schema mentioned" );
+
+ 	    $this->SkipSpaces( );
+
+	    $this->m_schema_name = $token;
+
+	    echo "\n". $this->m_obj_colors->ColoredCLI( 'schema is ' . $this->m_schema_name,  'dark_gray' ) ;
+
+	    // assert there follows a semicolon
+	    $this->AssertFollowingSemicolon( );
+
+	} elseif ( $token_next == 'PDO' ) {
 
 	    $this->SkipSpaces( );
 	    $token = $this->ScanToken( );
@@ -3985,6 +4318,72 @@ class cCommandInterpreter {
 	    $this->AssertFollowingSemicolon( );
 
 
+	} elseif ( $token_next == 'CONNECTION' ) {
+
+
+	    // Das Token 'dbparams' überspringen
+
+	    $this->SkipSpaces( );
+	    $token = $this->ScanToken( );
+	    $this->SkipSpaces( );
+
+	    //
+
+	    $token = $this->ScanToken( );
+
+	    $this->DieIf( strtoupper( $token ) != 'PARAMETERS',  "Program crashed: CONNECTION without 'PARAMETERS'" );
+
+	    $this->SkipSpaces( );
+
+	    //
+
+	    $token = $this->ScanToken( );
+
+	    $this->DieIf( strtoupper( $token ) != 'ARE',  "Program crashed: CONNECTION PARAMETERS without 'ARE'" );
+
+	    $this->SkipSpaces( );
+
+	    //
+;
+	    // Parameter einlesen
+
+	    $this->GetTextBetweenDelimiters( $params );
+
+	    // überspringe das Endzeichen
+	    $this->SkipSpaces( );
+
+	    // calculate the database provider, which leads the DNS
+
+	    if ( $this->m_is_pdo_active ) {
+
+		$pos_colon = strpos( $params, ':' );
+
+		$this->DieIf( $pos_colon === false, "Program crashed: DBO DSN without database provider ( '$params' )" );
+
+		$this->m_database_provider = strtoupper( trim( substr( $params, 0, $pos_colon ) ) );
+
+		if ( $this->m_database_provider == 'OCI' ) {
+		    $this->m_database_provider = 'ORACLE';
+		} elseif ( $this->m_database_provider == 'OCI8' ) {
+		    $this->m_database_provider = 'ORACLE';
+		} elseif ( $this->m_database_provider == 'MSSQL' ) {
+		    $this->m_database_provider = 'MICROSOFT';
+		}
+
+		echo "\n". $this->m_obj_colors->ColoredCLI( 'using PDO in order to access ' . $this->m_database_provider,  'dark_gray' ) ;
+
+	    }
+
+	    // ask the user for missing credentials
+
+	    echo "\n trying to connect to '{$this->m_database_provider}';";
+	    $this->m_obj_command_database_params = new cCommandDatabaseParams( $params, $this->m_database_provider, $this->m_is_pdo_active );
+	    $this->m_mysqli = $this->m_obj_command_database_params->GetOpenedDatabase( );
+
+	    // assert there follows a semicolon
+	    $this->AssertFollowingSemicolon( );
+
+
 	} elseif ( $token_next == 'DBPARAMS' ) {
 
 
@@ -4027,6 +4426,8 @@ class cCommandInterpreter {
 		    $this->m_database_provider = 'ORACLE';
 		} elseif ( $this->m_database_provider == 'OCI8' ) {
 		    $this->m_database_provider = 'ORACLE';
+		} elseif ( $this->m_database_provider == 'MSSQL' ) {
+		    $this->m_database_provider = 'MICROSOFT';
 		}
 
 		echo "\n". $this->m_obj_colors->ColoredCLI( 'using PDO in order to access ' . $this->m_database_provider,  'dark_gray' ) ;
@@ -4491,6 +4892,8 @@ Array
 
 	    $this->DieIf( $token != 'EXPORT', "Program crashed: RUN without EXPORT" );
 
+	    $this->DieIf( ( $this->m_database_provider == 'MICROSOFT' AND ( ! strlen( $this->m_schema_name ) ) ) , "Program crashed: MSSQL without SCHEMA" );
+
 	    // assert there follows a semicolon
 	    $this->AssertFollowingSemicolon( );
 
@@ -4536,13 +4939,13 @@ Array
 
 	    if ( $token == 'DATA' ) {
 		$this->ResetData( );
-		echo "\n". $this->m_obj_colors->ColoredCLI( "resetting data",  'red' ) ;
+		echo "\n". $this->m_obj_colors->ColoredCLI( "resetting data",  'yellow' ) ;
 	    } elseif ( $token == 'ACTIONS' ) {
 		$this->ResetActions( );
-		echo "\n". $this->m_obj_colors->ColoredCLI( "resetting actions",  'red' ) ;
+		echo "\n". $this->m_obj_colors->ColoredCLI( "resetting actions",  'yellow' ) ;
 	    } elseif ( $token == 'CODE' ) {
 		$this->ResetCode( );
-		echo "\n". $this->m_obj_colors->ColoredCLI( "resetting included code",  'red' ) ;
+		echo "\n". $this->m_obj_colors->ColoredCLI( "resetting included code",  'yellow' ) ;
 	    }
 
 	    // assert there follows a semicolon
@@ -4572,9 +4975,6 @@ Array
 
 
 }	// class cCommandInterpreter
-
-
-
 
 
 class cTestdatenGenerator {
@@ -4610,6 +5010,7 @@ class cTestdatenGenerator {
       echo "\n Time:  " . number_format( ( microtime(true) - $this->m_start_time ), 4) . " Seconds\n";
 
       echo "\n". $this->m_obj_colors->ColoredCLI( "finished", 'green' ) ;
+      echo "\n";
 
   }
 
@@ -4665,18 +5066,21 @@ class cTestdatenGenerator {
 
 }	// class cTestdatenGenerator
 
+$obj_colors = new cColorsCLI( );
+
 $opts = getopt( 'c:', array('config:') );
 // echo "\n opts = "; var_dump( $opts );
 
 if ( ( $opts === false ) || ( count( $opts ) == 0 ) ) {
-    echo("\n Abbruch: Erwarte Parameter mit Konfigurationsdatei");
-    echo("\n mk-test-data.php --config <configfile>\n");
+    echo "\n". $obj_colors->ColoredCLI( "\n Program crashed: no config file given", 'red' ) ;
+    echo "\n". $obj_colors->ColoredCLI( "\n mk-test-data.php --config <configfile>\n", 'red' ) ;
 } else {
      try {
 	$obj = new cTestdatenGenerator( $opts['config'] ) ;
 	$obj->Execute( );
      } catch( Exception $e ) {
- 	echo 'Exception abgefangen: ',  $e->getMessage(), "\n";
+ 	echo "\n". $obj_colors->ColoredCLI( "\n" . 'Catched an exception: ' .  $e->getMessage(), 'red' ) ;
+
      }
 }
 

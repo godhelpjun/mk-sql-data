@@ -20,7 +20,7 @@ reset actions;
 
 PDO interface is active;
 
-dbparams = "oci:dbname=192.168.1.65/XE,db2phpsite,db2phpsite,db2phpsite";
+connection parameters are "oci:dbname=192.168.1.65/XE,db2phpsite,db2phpsite,db2phpsite";
 
 filename is "output/random-fk-oracle-pdo.sql";
 

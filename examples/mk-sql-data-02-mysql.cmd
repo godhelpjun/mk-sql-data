@@ -42,7 +42,7 @@
 #
 #	increment <FIELDNAME> depending on <FIELDLIST>;
 #
-#	dbparams = <delimiter> <localhost>,<schema_name>,<user_name>,<user_password>
+#	connection parameters are <delimiter> <localhost>,<schema_name>,<user_name>,<user_password>
 #		will not be resetted after declaration!
 #		necessary for fetch-commands
 #
@@ -109,7 +109,7 @@ reset actions;
 filename is "output/random-fk-mysql.sql";
 
 # ask for user name and user password
-dbparams = "localhost,db2phpsite_test,,";
+connection parameters are "localhost,db2phpsite_test,,";
 
 read surnames from "data/de-surnames.txt";
 read prenames from "data/de-prenames.txt";

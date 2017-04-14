@@ -20,7 +20,7 @@ reset actions;
 
 PDO interface is active;
 
-dbparams = "informix:host=192.168.1.62;service=9088;database=db2phpsite;server=ol_informix1210;protocol=onsoctcp,db2phpsite,db2phpsite,db2phpsite";
+connection parameters are "informix:host=192.168.1.62;service=9088;database=db2phpsite;server=ol_informix1210;protocol=onsoctcp,db2phpsite,db2phpsite,db2phpsite";
 
 filename is "output/random-fk-informix-pdo.sql";
 

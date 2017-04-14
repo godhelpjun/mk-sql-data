@@ -15,7 +15,7 @@ reset actions;
 
 PDO interface is active;
 
-dbparams = "ibm:database=phpsite;protocol=tcpip;hostname=192.168.1.67;servicename=50000,phpsite,db2phpsite,db2phpsite";
+connection parameters are "ibm:database=phpsite;protocol=tcpip;hostname=192.168.1.67;servicename=50000,phpsite,db2phpsite,db2phpsite";
 
 filename is "output/random-fk-ibm-pdo.sql";
 

@@ -42,7 +42,7 @@
 #
 #	increment <FIELDNAME> depending on <FIELDLIST>;
 #
-#	dbparams = <delimiter> <localhost>,<schema_name>,<user_name>,<user_password>
+#	connection parameters are <delimiter> <localhost>,<schema_name>,<user_name>,<user_password>
 #		will not be resetted after declaration!
 #		necessary for fetch-commands
 #

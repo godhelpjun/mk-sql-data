@@ -42,7 +42,7 @@
 #
 #	increment <FIELDNAME> depending on <FIELDLIST>;
 #
-#	dbparams = <delimiter> <localhost>,<schema_name>,<user_name>,<user_password>
+#	connection parameters are <delimiter> <localhost>,<schema_name>,<user_name>,<user_password>
 #		will not be resetted after declaration!
 #		necessary for fetch-commands
 #
@@ -62,7 +62,7 @@
 ########################################################################
 
 PDO interface is active;
-dbparams = "pgsql:host=192.168.1.66 dbname=db2phpsite,db2phpsite,db2phpsite,db2phpsite";
+connection parameters are "pgsql:host=192.168.1.66 dbname=db2phpsite,db2phpsite,db2phpsite,db2phpsite";
 
 include text = "
 
